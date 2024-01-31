@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelenMebel.Api", "src\SelenMebel.Api\SelenMebel.Api.csproj", "{3E8B3517-8EAA-475A-8035-52F7882CB758}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelenMebel.Data", "src\SelenMebel.Data\SelenMebel.Data.csproj", "{36D3B99C-E27F-4FC8-8717-DB2DDA815EE2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelenMebel.Domain", "src\SelenMebel.Domain\SelenMebel.Domain.csproj", "{6B9C7902-0465-49F0-8579-EB797DAE44AE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelenMebel.Service", "src\SelenMebel.Service\SelenMebel.Service.csproj", "{945C831E-2E3B-4B6C-BA2E-E0BB6E2E7D59}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B9FCE929-7EC0-44EF-BEE9-991DC350081E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelenMebelMvcUI", "src\SelenMebelMvcUI\SelenMebelMvcUI.csproj", "{200136D2-7573-4991-9343-25A001E33857}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E8B3517-8EAA-475A-8035-52F7882CB758}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E8B3517-8EAA-475A-8035-52F7882CB758}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E8B3517-8EAA-475A-8035-52F7882CB758}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E8B3517-8EAA-475A-8035-52F7882CB758}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36D3B99C-E27F-4FC8-8717-DB2DDA815EE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36D3B99C-E27F-4FC8-8717-DB2DDA815EE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36D3B99C-E27F-4FC8-8717-DB2DDA815EE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36D3B99C-E27F-4FC8-8717-DB2DDA815EE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B9C7902-0465-49F0-8579-EB797DAE44AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B9C7902-0465-49F0-8579-EB797DAE44AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B9C7902-0465-49F0-8579-EB797DAE44AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B9C7902-0465-49F0-8579-EB797DAE44AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{945C831E-2E3B-4B6C-BA2E-E0BB6E2E7D59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{945C831E-2E3B-4B6C-BA2E-E0BB6E2E7D59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{945C831E-2E3B-4B6C-BA2E-E0BB6E2E7D59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{945C831E-2E3B-4B6C-BA2E-E0BB6E2E7D59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{200136D2-7573-4991-9343-25A001E33857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{200136D2-7573-4991-9343-25A001E33857}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{200136D2-7573-4991-9343-25A001E33857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{200136D2-7573-4991-9343-25A001E33857}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3E8B3517-8EAA-475A-8035-52F7882CB758} = {B9FCE929-7EC0-44EF-BEE9-991DC350081E}
+		{36D3B99C-E27F-4FC8-8717-DB2DDA815EE2} = {B9FCE929-7EC0-44EF-BEE9-991DC350081E}
+		{6B9C7902-0465-49F0-8579-EB797DAE44AE} = {B9FCE929-7EC0-44EF-BEE9-991DC350081E}
+		{945C831E-2E3B-4B6C-BA2E-E0BB6E2E7D59} = {B9FCE929-7EC0-44EF-BEE9-991DC350081E}
+		{200136D2-7573-4991-9343-25A001E33857} = {B9FCE929-7EC0-44EF-BEE9-991DC350081E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6FFEB9F6-7466-49B7-8818-719D91DED9BD}
+	EndGlobalSection
+EndGlobal

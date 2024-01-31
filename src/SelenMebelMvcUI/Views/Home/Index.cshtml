@@ -1,0 +1,86 @@
+﻿@model FurnitureViewModel
+@{
+    
+}
+
+<div class="my-2">
+    <form asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center">
+    <div class="col-12">
+        <label class="visually-hidden" for="categoryId">Category</label>
+        <select class="form-select" id="categoryId" name="categoryId">
+            <option selected>Category...</option>
+            @foreach (var category in Model.Categories)
+                {
+                    <option selected="(@category.Id == @Model.CategoryId)" value="@category.Id">@category.Name</option>
+                    
+                }
+        </select>
+    </div>
+
+  <div class="col-12">
+    <label class="visually-hidden" for="sTerm">Search by UniqueId</label>
+    <div class="input-group">
+      <div class="input-group-text"></div>
+      <input type="text" class="form-control" value="@Model.Sterm" id="sTerm" name="sTerm" placeholder="Search by UniqueId">
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="inlineFormCheck">
+      <label class="form-check-label" for="inlineFormCheck">
+        Remember me
+      </label>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Search</button>
+    <a href="/Home/Index" class="btn btn-dark">Reset</a>
+  </div>
+</form>
+</div>
+
+<div class="w-100 mt-4 d-flex flex-wrap">
+@foreach (var furniture in Model.Furnitures){
+<div class="card mx-2 mb-4" style="width: 16rem;">
+    @if (string.IsNullOrEmpty(furniture.Image))
+    {
+        <img @* style="width:100%; height:300px" *@ src="/furniture images/no-image-icon-6.png" class="card-img-top" alt="..."> 
+    }
+    else{
+        <img @* style="width:100%; height:300px" *@ src="/furniture images/@furniture.Image" class="card-img-top" alt="...">
+            }
+            <img src="" class="card-img-top" alt="...">
+    <div class="card-body">
+        <h5 class="card-title">@furniture.Name</h5>
+        <p class="card-text">
+            <b>Category: </b>@furniture.CategoryId <br />
+            <b>Price: </b>@furniture.Price <br />
+            <b>UniqueId: </b>@furniture.UniqueId
+        </p>
+        <button type="button" onclick="add(@furniture.Id)" class="btn btn-primary">Add to cart</button>
+    </div>
+</div>
+    }
+
+</div>
+
+@section Scripts{
+    <script>
+        alert(hello)
+        async function add(furnitureId){
+            try {
+                var response = await fetch(`/Cart/AddItem?furnitureId=${furnitureId}`);
+                if (response.status == 200) {
+                    var result = await response.json();
+                    console.log(result);
+                    var cartCountEl = document.getElementById("cartCount");
+                    cartCountEl.innerHTML = result;
+                }
+            } catch(err){
+                console.log(err);
+            }
+        }
+    </script>
+}

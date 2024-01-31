@@ -1,0 +1,48 @@
+﻿@page
+@model SelenMebelMvcUI.Views.Admin.Pages.IndexModel
+@{
+}
+
+<h2 class="text-center mb-5">List of Furnitures</h2>
+
+<div class="row mb-5">
+	<div class="col">
+		<a class='btn btn-primary' href="/Admin/Furnitures/Create">New Furniture</a>
+
+	</div>
+	<div class="col">	
+
+	</div>
+</div>
+
+<table class="table">
+	<tr>
+		<th>Id</th>
+		<th>Name</th>
+		<th>Price</th>
+		<th>Image</th>
+		<th>UniqueId</th>
+		<th>CreatedAt</th>
+		<th>CategoryId</th>
+		<th>TypeOfFurnitureId</th>
+
+	</tr>
+
+	@foreach (var furniture in Model.Furnitures)
+	{
+		<tr>
+			<td>@furniture.Id</td>
+			<td>@furniture.Name</td>
+			<td>@(furniture.Price)$</td>
+			<td><img src="/furniture images/@furniture.Image" width="100" /></td>
+			<td>@furniture.CreatedAt.ToString("dd/MM/yyyy")</td>
+			<td>@furniture.UniqueId</td>
+			<td>@furniture.CategoryId</td>
+			<td>@furniture.TypeOfFurnitureId</td>
+			<td style="white-space:nowrap">
+				<a class="btn btn-primary btn-sm" href="/Admin/Pages/Edit?id=@furniture.Id">Edit</a>
+				<a class="btn btn-danger btn-sm" href="/Admin/Pages/Delete?id=@furniture.Id">Delete</a>
+			</td>
+		</tr>
+	}
+</table>
