@@ -17,5 +17,5 @@ public class CartDetail
     public Furniture Furniture { get; set; }
 
     public long Quantity { get; set; }
-
+    public decimal UnitPrice { get; set; }
 }

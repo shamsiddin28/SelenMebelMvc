@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SelenMebel.Domain.Entities;
+using SelenMebel.Domain.Enums;
 
 namespace SelenMebelMvcUI.Repositories
 {
@@ -139,9 +140,58 @@ namespace SelenMebelMvcUI.Repositories
             return userId;
         }
 
-        Task<int> ICartRepository.GetCartItemCount(string userId)
+        public async Task<bool> DoCheckout()
         {
-            throw new NotImplementedException();
+            using var transaction = _dBcontext.Database.BeginTransaction();
+            try
+            {
+                // logic 
+                // move data from cartDetail to order and order detail then we will remove cart detail
+                var userId = GetUserId();
+                if (userId == null)
+                    throw new Exception("User is not logged-in");
+                var cart = await GetCart(userId);
+                if (cart == null)
+                    throw new Exception("Invalid Cart");
+                var cartDetail = _dBcontext.CartDetails
+                                           .Where(c => c.Id == cart.Id).ToList();
+                if (cartDetail.Count == 0)
+                    throw new Exception("Cart is Empty");
+                var order = new Order
+                {
+                    UserId = userId,
+                    CreatedAt = DateTime.UtcNow,
+                    OrderStatus = OrderStatus.Pending,
+
+                };
+                _dBcontext.Orders.Add(order);
+                _dBcontext.SaveChanges();
+                foreach (var item in cartDetail)
+                {
+                    var orderDetail = new OrderDetail
+                    {
+                        FurnitureId = item.FurnitureId,
+                        OrderId = item.Id,
+                        Quantity = item.Quantity,
+                        UnitPrice = item.UnitPrice
+                    };
+                    _dBcontext.OrderDetails.Add(orderDetail);
+                }
+                _dBcontext.SaveChanges();
+
+                // removing the cartDetails
+                _dBcontext.CartDetails.RemoveRange(cartDetail);
+                _dBcontext.SaveChanges();
+                transaction.Commit();
+
+                return false;
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }
