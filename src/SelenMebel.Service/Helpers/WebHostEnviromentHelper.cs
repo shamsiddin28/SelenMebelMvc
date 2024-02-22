@@ -2,5 +2,5 @@
 
 public class WebHostEnviromentHelper
 {
-    public static string WebRootPath { get; set; }
+	public static string WebRootPath { get; set; }
 }

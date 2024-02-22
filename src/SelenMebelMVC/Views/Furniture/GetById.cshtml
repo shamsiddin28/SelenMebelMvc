@@ -1,0 +1,105 @@
+﻿@using SelenMebel.Service.DTOs.Furnitures
+@model FurnitureForResultDto
+@{
+	ViewData["Title"] = "Furniture";
+}
+
+<h3 class="text-center mb-5">@ViewData["Title"]</h3>
+
+<div class="row mb-5">
+	<div class='alert alert-success alert-dismissible fade show' role='alert'>
+		<strong>@TempData["Message"]</strong>
+		<button type="button" class="btn-close" data-ds-dismiss='alert' aria-label="Close"></button>
+	</div>
+
+	<div class="col">
+		<a class='btn btn-primary' href='/Furniture/Create'>Create New Furniture</a>
+	</div>
+	<div class="col">
+	</div>
+</div>
+
+
+
+<table class="table table-bordered table-responsive table-hover">
+	<thead>
+		<tr class="table-active">
+			<th>
+				@Html.DisplayNameFor(model => model.Name)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.TypeOfFurniture.Category)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.TypeOfFurniture.TypeOfSelen)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Image)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Description)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.UniqueId)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Price)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.CreatedAt)
+			</th>
+			<th>
+				Action
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null)
+		{
+				<tr>
+					<td>
+						@Html.DisplayFor(model => model.Name)
+					</td>
+					<td>
+						@Html.DisplayFor(model => model.TypeOfFurniture.Category.Name)
+					</td>
+					<td>
+						@Html.DisplayFor(model => model.TypeOfFurniture.TypeOfSelen)
+					</td>
+					<td>
+						<img src="~/FurnitureImages/Images/@Model.Image" alt="" width=100 />
+					</td>
+					<td>
+						@Html.DisplayFor(model => model.Description)
+					</td>
+					<td>
+						@Html.DisplayFor(model => model.UniqueId)
+					</td>
+					<td>
+						@(Html.DisplayFor(model => model.Price))$
+					</td>
+					<td>
+						@Html.DisplayFor(model => model.CreatedAt)
+					</td>
+					<td style="white-space:nowrap">
+						<div class="btn-group btn-group-sm">
+							<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">Edit</a>
+							<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm">Delete</a>
+						</div>
+					</td>
+				</tr>
+			
+		}
+		else
+		{
+			<tr>
+				<td colspan="8">
+					<div>
+						Furnitures not available in the database
+					</div>
+				</td>
+			</tr>
+		}
+	</tbody>
+
+</table>

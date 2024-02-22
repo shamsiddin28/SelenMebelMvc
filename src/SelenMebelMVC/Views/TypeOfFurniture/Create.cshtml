@@ -1,0 +1,82 @@
+﻿@using SelenMebel.Domain.Enums
+@using SelenMebel.Service.DTOs.TypeOfFurnitures;
+@using SelenMebel.Service.DTOs.Categories;
+@model TypeOfFurnitureForCreationDto;
+@{
+    ViewData["Title"] = "New TypeOfFurniture";
+}
+
+
+<div class="row">
+    <div class="col-md-8 mx-auto rounded border p-3">
+        <h2 class="text-center mb-5">@ViewData["Title"]</h2>
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Category</label>
+                <div class="col-sm-8">
+                    @* <select class="form-select" asp-for="CategoryId">
+                        <option value="Other">--Select Category--</option>
+                        <option value="1">Oshxona mebellari</option>
+                        <option value="2">Shkaf mebellar</option>
+                        <option value="3">Ofis mebellari</option>
+                        <option value="4">Yumshoq mebellar</option>
+                        <option value="5">Ayvon va zal mebellari</option>
+                        <option value="6">Yotoqxona mebellari</option>
+                        <option value="7">Bolalar mebellari</option>
+                        <option value="8">Polkalar va stellaj</option>
+                        <option value="9">Stol va Stullar</option>
+                    </select> *@
+                    <select asp-for="CategoryId" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container">
+                        @{
+                            var categories = ViewBag.Categories;
+                            foreach (var category in categories)
+                            {
+                                <option value="@category.Id.ToString()">@category.Name.ToString()</option>
+                            }
+                        }
+                    </select>
+                
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">TypeOfFurniture</label>
+                <div class="col-sm-8">
+                    <select class="form-select" asp-for="TypeOfSelen">
+                        <option value="0">--Select TypeOfFurniture--</option>
+                        <option value="1">HiTech</option>
+                        <option value="2">Classic</option>
+                        <option value="3">Royal</option>
+                        <option value="4">None</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label" asp-for="Image">Image</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="file" asp-for="Image">
+                    <span asp-validation-for="Image" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="offset-sm-4 col-sm-4 d-grid">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                <div class="col-sm-4 d-grid">
+                    <a class="btn btn-outline-primary" href="/TypeOfFurniture/Index" role="button">Cancel</a>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

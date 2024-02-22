@@ -1,0 +1,73 @@
+﻿@model IEnumerable<SelenMebel.Service.DTOs.TypeOfFurnitures.TypeOfFurnitureForResultDto>
+@{
+	ViewData["Title"] = "TypeOfFurniture List";
+}
+
+<h3 class="text-center mb-5">@ViewData["Title"]</h3>
+
+
+<div class="row mb-5">
+	<div class="col">
+		<a class='btn btn-primary' href='/TypeOfFurniture/Create'>Create New TypeOfFurniture</a>
+	</div>
+
+	<div class="col">
+	</div>
+</div>
+
+
+<table class="table table-bordered table-responsive table-hover">
+	<thead>
+		<tr class="table-active">
+			<th>
+				@Html.DisplayNameFor(model => model.Category)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.TypeOfSelen)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Image)
+			</th>
+			<th>
+				Action
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null && Model.Any())
+		{
+			@foreach (var typeOfFurniture in Model)
+			{
+				<tr>
+					<td>
+						@Html.DisplayFor(model => typeOfFurniture.Category.Name)
+					</td>
+					<td>
+						@Html.DisplayFor(model => typeOfFurniture.TypeOfSelen)
+					</td>
+					<td>
+						<img src="~/TypeOfFurnitureImages/Images/@typeOfFurniture.Image" alt="" width=100 />
+					</td>
+					<td style="white-space:nowrap">
+						<div class="btn-group btn-group-sm">
+							<a asp-action="Edit" asp-route-id="@typeOfFurniture.Id" class="btn btn-primary btn-sm">Edit</a>
+							<a asp-action="Delete" asp-route-id="@typeOfFurniture.Id" class="btn btn-danger btn-sm">Delete</a>
+						</div>
+					</td>
+				</tr>
+			}
+		}
+		else
+		{
+			<tr>
+				<td colspan="3">
+					<div>
+						TypeOfFurnitures not available in the database
+					</div>
+				</td>
+			</tr>
+		}
+	</tbody>
+
+</table>
+

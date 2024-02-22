@@ -1,0 +1,164 @@
+﻿@model IEnumerable<SelenMebel.Service.DTOs.Furnitures.FurnitureForResultDto>
+@{
+	ViewData["Title"] = "Furnitures";
+}
+
+<h3 class="text-center mb-5">@ViewData["Title"]</h3>
+
+@if (TempData["InfoMessage"] != null)
+{
+	<div class='alert alert-info alert-dismissible fade show' role='alert'>
+		<strong>Information ! </strong> @TempData["InfoMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}	
+else if (TempData["SuccessMessage"] != null)
+{
+	<div class='alert alert-success alert-dismissible fade show' role='alert'>
+		<strong>Success ! </strong> @TempData["SuccessMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
+else if (TempData["ErrorMessage"] != null)
+{
+	<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+		<strong>Error ! </strong> @TempData["ErrorMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
+
+
+<div class="row mb-5">
+	<div class="col">
+		<a class='btn btn-primary' href='/Furniture/Create'>Create New Furniture</a>
+	</div>
+	<div class="col">
+	</div>	
+</div>
+
+
+
+<div class="row mb-5">
+	@using (Html.BeginForm("Index", "Furniture", FormMethod.Get))
+	{
+		<table>
+			<tr>
+				<td>
+					<span><b>Search By:</b></span>
+					@Html.RadioButton("searchBy", "UniqueId", true)
+					<text>Unique Id</text>
+					@Html.RadioButton("searchBy", "Price")
+					<text>Price</text>
+					@Html.RadioButton("searchBy", "CategoryName")
+					<text>Category Name</text>
+					@Html.RadioButton("searchBy", "FurnitureName")
+					<text>Furniture Name</text>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					@Html.TextBox("searchValue", null, new {Class = "form-control", placeholder="Enter Furniture or Category Name or UniqueId"})
+				</td>
+				<td>
+					&nbsp;
+				</td>
+				<td>
+					<input type="submit" value="Search" class="btn btn-success"/>
+				</td>
+			</tr>
+		</table>
+	}
+</div>
+
+
+
+<table class="table table-bordered table-responsive table-hover">
+	<thead>
+		<tr class="table-active">
+			<th>
+				@Html.DisplayNameFor(model => model.Name)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.TypeOfFurniture.Category)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.TypeOfFurniture.TypeOfSelen)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Image)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Description)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.UniqueId)
+			</th>
+			<th>	
+				@Html.DisplayNameFor(model => model.Price)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.CreatedAt)
+			</th>
+			<th>
+				Action
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null && Model.Any())
+		{
+			@foreach (var furniture in Model)
+			{
+				<tr>
+					<td>
+						@Html.DisplayFor(model => furniture.Name)
+					</td>
+					<td>
+						@Html.DisplayFor(model => furniture.TypeOfFurniture.Category.Name)
+					</td>
+					<td>
+						@Html.DisplayFor(model => furniture.TypeOfFurniture.TypeOfSelen)
+					</td>
+					<td>
+						<img src="~/FurnitureImages/Images/@furniture.Image" alt="" width=100 />
+					</td>
+					<td>
+						@Html.DisplayFor(model => furniture.Description)
+					</td>
+					<td>
+						@Html.DisplayFor(model => furniture.UniqueId)
+					</td>
+					<td>
+						@(Html.DisplayFor(model => furniture.Price))$
+					</td>
+					<td>
+						@Html.DisplayFor(model => furniture.CreatedAt)
+					</td>
+					<td style="white-space:nowrap">
+						<div class="btn-group btn-group-sm">
+							<a asp-action="Edit" asp-route-id="@furniture.Id" class="btn btn-primary btn-sm">Edit</a>
+							<a asp-action="Delete" asp-route-id="@furniture.Id" class="btn btn-danger btn-sm">Delete</a>
+						</div>
+					</td>
+				</tr>
+			}
+		}
+		else
+		{
+			<tr>
+				<td colspan="8">
+					<div>
+						Furnitures not available in the database
+					</div>
+				</td>
+			</tr>
+		}
+	</tbody>
+	
+</table>

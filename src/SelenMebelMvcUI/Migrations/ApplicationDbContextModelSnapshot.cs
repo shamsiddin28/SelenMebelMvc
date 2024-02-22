@@ -295,17 +295,12 @@ namespace SelenMebelMvcUI.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<long>("TypeOfFurnitureId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("UniqueId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("TypeOfFurnitureId");
 
                     b.ToTable("Furniture");
                 });
@@ -420,6 +415,9 @@ namespace SelenMebelMvcUI.Migrations
                     b.Property<long>("CategoryId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("FurnitureId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
@@ -429,6 +427,8 @@ namespace SelenMebelMvcUI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("FurnitureId");
 
                     b.ToTable("TypeOfFurniture");
                 });
@@ -511,21 +511,13 @@ namespace SelenMebelMvcUI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SelenMebel.Domain.Entities.TypeOfFurniture", "TypeOfFurniture")
-                        .WithMany()
-                        .HasForeignKey("TypeOfFurnitureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
-
-                    b.Navigation("TypeOfFurniture");
                 });
 
             modelBuilder.Entity("SelenMebel.Domain.Entities.FurnitureFeature", b =>
                 {
                     b.HasOne("SelenMebel.Domain.Entities.Furniture", "Furniture")
-                        .WithMany("Features")
+                        .WithMany("FurnitureFeatures")
                         .HasForeignKey("FurnitureId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -560,6 +552,10 @@ namespace SelenMebelMvcUI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SelenMebel.Domain.Entities.Furniture", null)
+                        .WithMany("TypeOfFurnitures")
+                        .HasForeignKey("FurnitureId");
+
                     b.Navigation("Category");
                 });
 
@@ -574,9 +570,11 @@ namespace SelenMebelMvcUI.Migrations
                 {
                     b.Navigation("CartDetail");
 
-                    b.Navigation("Features");
+                    b.Navigation("FurnitureFeatures");
 
                     b.Navigation("OrderDetail");
+
+                    b.Navigation("TypeOfFurnitures");
                 });
 
             modelBuilder.Entity("SelenMebel.Domain.Entities.Order", b =>

@@ -1,23 +1,21 @@
-﻿using SelenMebel.Service.DTOs.CartDetails;
-using SelenMebel.Service.DTOs.ImageOfFurnitures;
-using SelenMebel.Service.DTOs.OrderDetails;
+﻿using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace SelenMebel.Service.DTOs.Furnitures;
 
 public class FurnitureForCreationDto
 {
-    public long FurnitureFeatureId { get; set; }
 
-    [Required]
-    public string Name { get; set; }
+	[MaxLength(100)]
+	public string Name { get; set; } = string.Empty;
+	public string Description { get; set; } = string.Empty;
 
-    [Required]
-    public string Price { get; set; }
+	[Required, Range(0.01, 1000000.00, ErrorMessage = "Value must be between 0.01 and 1000000.00")]
+	public decimal Price { get; set; }
 
-    [Required]
-    public List<ImageOfFurnitureForCreationDto> ImageOfFurnitures { get; set; }
+	[Required(ErrorMessage ="The image is Required")]
+	public IFormFile Image { get; set; }
 
-    public List<OrderDetailForCreationDto> OrderDetail { get; set; }
-    public List<CartDetailForCreationDto> CartDetail { get; set; }
+	[Required(ErrorMessage = "The TypeOfFurniture Id is Required")]
+	public long TypeOfFurnitureId { get; set; }
 }

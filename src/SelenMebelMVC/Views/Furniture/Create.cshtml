@@ -1,0 +1,158 @@
+﻿@using SelenMebel.Service.DTOs.Furnitures;
+@using SelenMebel.Domain.Enums;
+@using SelenMebelMVC.Models;
+
+@model FurnitureForCreationDto;
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+<div class="row">
+    <div class="col-md-8 mx-auto rounded border p-3">
+        <h2 class="text-center mb-5">New Furniture</h2>
+        
+        @* @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class='alert alert-warning alert-dismissible fade show' role='alert'>
+                <strong>@ViewBag.Message</strong>
+                <button type="button" class="btn-close" data-ds-dismiss='alert' aria-label="Close"></button>
+            </div>
+        }
+        else if (string.IsNullOrWhiteSpace(@ViewBag.Message))
+        {
+            <div class='alert alert-success alert-dismissible fade show' role='alert'>
+                <strong>@ViewBag.Message</strong>
+                <button type="button" class="btn-close" data-ds-dismiss='alert' aria-label="Close"></button>
+            </div>
+        } *@
+
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Category</label>
+                <div class="col-sm-8">
+                    <select id="mySelect" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container">
+                        @{
+                            var categories = ViewBag.Categories;
+                            foreach (var category in categories)
+                            {
+                                <option value="@category.Id.ToString()">@category.Name.ToString()</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label" asp-for="TypeOfFurnitureId" id="typeOfFurniture">TypeOfFurniture</label>
+                <div class="col-sm-8">
+                    <select asp-for="TypeOfFurnitureId" id="typeOfSelenSelect" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container">
+                        <option value="">Select Type of Furniture</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label asp-for="Name" class="col-sm-4 col-form-label"></label>
+                <div class="col-sm-8">
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label asp-for="Description" class="col-sm-4 col-form-label"></label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" asp-for="Description"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label asp-for="Price" class="col-sm-4 col-form-label"></label>
+                <div class="col-sm-8">
+                    <input asp-for="Price" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label" asp-for="Image">Image</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="file" asp-for="Image">
+                    <span asp-validation-for="Image" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="offset-sm-4 col-sm-4 d-grid">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                <div class="col-sm-4 d-grid">
+                    <a class="btn btn-outline-primary" href="/Furniture/Index" role="button">Cancel</a>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.getElementById('mySelect').onchange = function () {
+            var selectedValue = this.value;
+
+            // Fetch request
+            fetch(`https://localhost:7200/api/Categories/${selectedValue}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle response data accordingly
+                    var typeOfFurnitures = data.typeOfFurnitures;
+                    // Clear the select options
+                    $('#typeOfSelenSelect').empty();
+
+                    // Populate the select options with typeOfSelen enums
+                    if (typeOfFurnitures.length === 0) {
+                        $('#typeOfSelenSelect').append(`<option value="Have not any TypeOfFurnitures"></option>`);
+                        alert("For this category have not the typeOfFurnitures !")
+                    } else {
+                        typeOfFurnitures.forEach(furniture => {
+                            var typeOfSelen = furniture.typeOfSelen;
+                            var typeOfFurnitureId = furniture.id; // "Id" sini olish
+                            var optionText = '';
+                            switch (typeOfSelen) {
+                                case 1:
+                                    optionText = 'HiTech';
+                                    break;
+                                case 2:
+                                    optionText = 'Classic';
+                                    break;
+                                case 3:
+                                    optionText = 'Royal';
+                                    break;
+                                case 4:
+                                    optionText = 'None';
+                                    break;
+                                default:
+                                    optionText = 'Unknown';
+                            }
+                            $('#typeOfSelenSelect').append(`<option value="${typeOfFurnitureId}">${optionText}</option>`);
+                            console.log(typeOfFurnitureId, optionText)
+                        });
+                    }
+                })
+                .catch(error => {
+                    alert('There was a problem with your fetch operation:', error);
+                });
+        };
+    </script>
+}

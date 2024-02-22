@@ -1,9 +1,8 @@
 ﻿@model IEnumerable<Order>
 @{
-    ViewData["Title"] = "GetUserCart";
 }
 <div style="width:100%;" class="mt-2">
-    <a href="/Identity/Account/Manage" class="btn btn-primaryk my-2">Back</a>
+    <a href="/Identity/Account/Manage" class="btn btn-primary my-2">Back</a>
     <h4>My Orders</h4>
     @if (Model != null && Model.Count() > 0)
     {
@@ -15,8 +14,8 @@
             @foreach (var order in Model)
             {
             <tr>
-                <td>@order.CreatedAt.ToString("dd--MM-yyyy")</td>
-                <td>@order.OrderStatus.ToString()</td>
+                <td>@order.CreatedAt.ToString("dd-MM-yyyy")</td>
+                <td>@order.OrderStatus.ToString()</td>      
             </tr>
                 @if (order.OrderDetail != null && order.OrderDetail.Count > 0)
                 {
@@ -41,7 +40,6 @@
                                 </tr>
                                 @foreach (var item in order.OrderDetail)
                                 {
-                                    
                                     <tr>
                                         <td>@item.Furniture.Name</td>
                                         <td>
@@ -54,14 +52,14 @@
                                                 <img src="/furniture images/@item.Furniture.Image" style="width:80px;height:100px" />
                                             }
                                         </td>
-                                        <td>@item.Furniture.Category.Name</td>
+                                        <td>@item.Furniture.TypeOfFurniture.Category.Name</td>
                                         <td>@item.Furniture.Price X @item.Quantity</td>
                                         <td>@(item.Furniture.Price * item.Quantity)</td>
                                     </tr>
                                 }
                             </table>
-                </td>
-            </tr>
+                        </td>
+                    </tr>
                 }
             }
             

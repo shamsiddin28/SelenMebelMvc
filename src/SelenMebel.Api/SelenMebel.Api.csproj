@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <InvariantGlobalization>false</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,26 +15,32 @@
   </ItemGroup>
 
   <ItemGroup>
-	<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
-      <PrivateAssets>all</PrivateAssets>
+	  <PackageReference Include="AutoMapper" Version="12.0.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.1" />
+	  <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.1" />
+	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.1" />
+
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
+
+		  <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SelenMebel.Data\SelenMebel.Data.csproj" />
     <ProjectReference Include="..\SelenMebel.Service\SelenMebel.Service.csproj" />
+    <ProjectReference Include="..\SelenMebelMVC\SelenMebelMVC.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Logs\" />
-    <Folder Include="wwwroot\CategoryImages\Images\" />
     <Folder Include="wwwroot\FurnitureImages\Images\" />
     <Folder Include="wwwroot\TypeOfFurnitureImages\Images\" />
   </ItemGroup>

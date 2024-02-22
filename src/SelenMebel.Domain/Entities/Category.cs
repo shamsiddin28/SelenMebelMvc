@@ -6,15 +6,17 @@ namespace SelenMebel.Domain.Entities;
 [Table("Category")]
 public class Category
 {
-    public long Id { get; set; }
+	public long Id { get; set; }
 
-    [MaxLength(40)]
-    public string Name { get; set; }
+	[MaxLength(40)]
+	public string Name { get; set; }
 
-    [Required]
-    public string Image { get; set; }
+	[Required]
+	public string Image { get; set; }
 
-    public List<Furniture> Furnitures { get; set; }
-    public List<TypeOfFurniture> TypeOfFurnitures { get; set; }
+	public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+	public DateTime? UpdatedAt { get; set; }
+	public bool IsDeleted { get; set; } = false;
 
+	public ICollection<TypeOfFurniture> TypeOfFurnitures { get; set; }	
 }

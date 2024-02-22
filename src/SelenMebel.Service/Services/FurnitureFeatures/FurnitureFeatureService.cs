@@ -1,90 +1,118 @@
-﻿namespace SelenMebel.Service.Services.FurnitureFeatures;
+﻿using AutoMapper;
+using SelenMebel.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using SelenMebel.Data.IRepositories;
+using SelenMebel.Service.Exceptions;
+using SelenMebel.Service.Extensions;
+using SelenMebel.Domain.Configurations;
+using SelenMebel.Service.DTOs.FurnitureFeatures;
+using SelenMebel.Service.Interfaces.FurnitureFeatures;
 
-public class FurnitureFeatureService
+namespace SelenMebel.Service.Services.FurnitureFeatures;
+
+public class FurnitureFeatureService : IFurnitureFeatureService
 {
 
-    //private readonly IMapper _mapper;
-    //private readonly IRepository<FurnitureFeature> _repository;
+	private readonly IMapper _mapper;
+	private readonly IFurnitureFeatureRepository _furnitureFeatureRepository;
+	private readonly IFurnitureRepository _furnitureRepository;
 
-    //public FurnitureFeatureService(IMapper mapper, IRepository<FurnitureFeature> repository)
-    //{
-    //    _mapper = mapper;
-    //    _repository = repository;
-    //}
+	public FurnitureFeatureService(
+		IMapper mapper,
+		IFurnitureFeatureRepository FurnitureFeatureRepository,
+		IFurnitureRepository furnitureRepository
+		)
+	{
+		_mapper = mapper;
+		_furnitureFeatureRepository = FurnitureFeatureRepository;
+		_furnitureRepository = furnitureRepository;
+	}
 
-    //public async Task<FurnitureFeatureForResultDto> CreateAsync(FurnitureFeatureForCreationDto dto)
-    //{
-    //    var addFurnitureFeature = await _repository.SelectAll()
-    //            .Where(tof => tof.Name.ToLower() == dto.Name.ToLower())
-    //            .FirstOrDefaultAsync();
+	public async Task<FurnitureFeatureForResultDto> CreateAsync(FurnitureFeatureForCreationDto dto)
+	{
+		var furniture = await _furnitureRepository.SelectAll()
+				.Where(tof => tof.Id == dto.FurnitureId)
+				.FirstOrDefaultAsync();
 
-    //    if (addFurnitureFeature is not null)
-    //        throw new SelenMebelException(409, "Furniture already exists");
+		if (furniture is null)
+			throw new SelenMebelException(404, "Furniture is not found !");
 
-    //    var mapped = _mapper.Map<FurnitureFeature>(dto);
-    //    mapped.CreatedAt = DateTime.UtcNow;
+		var addFurnitureFeature = await _furnitureFeatureRepository.SelectAll()
+				.Where(fF => fF.Name.ToLower() == dto.Name.ToLower() && fF.Value.ToLower() == dto.Value.ToLower())
+				.FirstOrDefaultAsync();
 
-    //    var result = await _repository.InsertAsync(mapped);
+		if (addFurnitureFeature is not null)
+			throw new SelenMebelException(409, "FurnitureFeature already exists !");
 
-    //    return _mapper.Map<FurnitureFeatureForResultDto>(result);
-    //}
+		var mapped = _mapper.Map<FurnitureFeature>(dto);
+		mapped.CreatedAt = DateTime.UtcNow;
 
-    //public async Task<FurnitureFeatureForResultDto> ModifyAsync(long id, FurnitureFeatureForUpdateDto dto)
-    //{
-    //    var furniture = await _repository.SelectAll()
-    //           .Where(u => u.Id == id)
-    //           .AsNoTracking()
-    //           .FirstOrDefaultAsync();
+		var result = await _furnitureFeatureRepository.InsertAsync(mapped);
 
-    //    if (furniture is null)
-    //        throw new SelenMebelException(404, "FurnitureFeature is not found");
+		return _mapper.Map<FurnitureFeatureForResultDto>(result);
+	}
 
-    //    var mappedFurnitureFeature = this._mapper.Map(dto, furniture);
+	public async Task<FurnitureFeatureForResultDto> ModifyAsync(long id, FurnitureFeatureForUpdateDto dto)
+	{
+		var furniture = await _furnitureRepository.SelectAll()
+				.Where(tof => tof.Id == dto.FurnitureId)
+				.FirstOrDefaultAsync();
 
-    //    mappedFurnitureFeature.UpdatedAt = DateTime.UtcNow;
+		if (furniture is null)
+			throw new SelenMebelException(404, "Furniture is not found !");
 
-    //    await this._repository.UpdateAsync(mappedFurnitureFeature);
+		var addFurnitureFeature = await _furnitureFeatureRepository.SelectAll()
+				.Where(fF => fF.Id == id)
+				.FirstOrDefaultAsync();
 
-    //    return this._mapper.Map<FurnitureFeatureForResultDto>(mappedFurnitureFeature);
-    //}
+		if (addFurnitureFeature is null)
+			throw new SelenMebelException(404, "FurnitureFeature is not found !");
 
-    //public async Task<bool> RemoveAsync(long id)
-    //{
-    //    var furnitureFeature = await _repository.SelectAll()
-    //            .Where(u => u.Id == id)
-    //            .AsNoTracking()
-    //            .FirstOrDefaultAsync();
 
-    //    if (furnitureFeature is null)
-    //        throw new SelenMebelException(404, "FurnitureFeature is not found !");
+		var mappedFurnitureFeature = this._mapper.Map(dto, addFurnitureFeature);
+		mappedFurnitureFeature.UpdatedAt = DateTime.UtcNow;
 
-    //    await _repository.DeleteAsync(id);
-    //    furnitureFeature.IsDeleted = true;
+		await _furnitureFeatureRepository.UpdateAsync(mappedFurnitureFeature);
 
-    //    return true;
-    //}
+		return _mapper.Map<FurnitureFeatureForResultDto>(mappedFurnitureFeature);
+	}
 
-    //public async Task<IEnumerable<FurnitureFeatureForResultDto>> RetrieveAllAsync(PaginationParams @params)
-    //{
-    //    var furnitureFeatures = await _repository.SelectAll()
-    //              .Include(ff => ff.FurnitureFeatures)
-    //              .AsNoTracking()
-    //              .ToPagedList(@params)
-    //              .ToListAsync();
+	public async Task<bool> RemoveAsync(long id)
+	{
+		var furnitureFeature = await _furnitureFeatureRepository.SelectAll()
+				.Where(u => u.Id == id)
+				.AsNoTracking()
+				.FirstOrDefaultAsync();
 
-    //    return _mapper.Map<IEnumerable<FurnitureFeatureForResultDto>>(furnitureFeatures);
-    //}
+		if (furnitureFeature is null)
+			throw new SelenMebelException(404, "FurnitureFeature is not found !");
 
-    //public async Task<FurnitureFeatureForResultDto> RetrieveByIdAsync(long id)
-    //{
-    //    var byFurnitureFeature = await _repository.SelectAll()
-    //            .Where(u => u.Id == id)
-    //            .Include(f => f.FurnitureFeatures)
-    //            .AsNoTracking()
-    //            .FirstOrDefaultAsync() ??
-    //                throw new SelenMebelException(404, "FurnitureFeature is not found! ");
+		await _furnitureFeatureRepository.DeleteAsync(id);
 
-    //    return _mapper.Map<FurnitureFeatureForResultDto>(byFurnitureFeature);
-    //}
+		return true;
+	}
+
+	public async Task<IEnumerable<FurnitureFeatureForResultDto>> RetrieveAllAsync(PaginationParams @params)
+	{
+		var furnitureFeatures = await _furnitureFeatureRepository.SelectAll()
+				  .Include(f => f.Furniture)
+				  .AsNoTracking()
+				  .ToPagedListFurnitureFeature(@params)
+				  .ToListAsync();
+
+		return _mapper.Map<IEnumerable<FurnitureFeatureForResultDto>>(furnitureFeatures);
+	}
+
+	public async Task<FurnitureFeatureForResultDto> RetrieveByIdAsync(long id)
+	{
+		var furnitureFeature = await _furnitureFeatureRepository.SelectAll()
+				.Where(u => u.Id == id)
+				.Include(f => f.Furniture)
+				.AsNoTracking()
+				.FirstOrDefaultAsync() ??
+					throw new SelenMebelException(404, "FurnitureFeature is not found !");
+
+		return _mapper.Map<FurnitureFeatureForResultDto>(furnitureFeature);
+	}
 
 }

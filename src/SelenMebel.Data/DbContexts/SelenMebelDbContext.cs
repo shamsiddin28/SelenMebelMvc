@@ -1,133 +1,156 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SelenMebel.Domain.Entities;
 
 namespace SelenMebel.Data.DbContexts;
 
-public class SelenMebelDbContext : DbContext
+public class SelenMebelDbContext : IdentityDbContext
 {
-    public SelenMebelDbContext(DbContextOptions<SelenMebelDbContext> options) : base(options)
+	public SelenMebelDbContext(DbContextOptions<SelenMebelDbContext> options) : base(options)
+	{
+	}
+
+	public DbSet<Category> Categories { get; set; }
+	public DbSet<Furniture> Furnitures { get; set; }
+	public DbSet<TypeOfFurniture> TypeOfFurnitures { get; set; }
+	public DbSet<FurnitureFeature> FurnitureFeatures { get; set; }
+	public DbSet<CartDetail> CartDetails { get; set; }
+	public DbSet<Order> Orders { get; set; }
+	public DbSet<OrderDetail> OrderDetails { get; set; }
+	public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+
+
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.ApplyConfiguration(new CategoryConfiguration());
+        modelBuilder.ApplyConfiguration(new FurnitureConfiguration());
+        modelBuilder.ApplyConfiguration(new FurnitureFeatureConfiguration());
+        modelBuilder.ApplyConfiguration(new TypeOfFurnitureConfiguration());
+        modelBuilder.ApplyConfiguration(new ShoppingCartConfiguration());
+        modelBuilder.ApplyConfiguration(new OrderDetailConfiguration());
+        modelBuilder.ApplyConfiguration(new OrderConfiguration());
+        modelBuilder.ApplyConfiguration(new CartDetailConfiguration());
+
+        modelBuilder.Entity<ShoppingCart>().Ignore(c => c.CartDetails);
+        modelBuilder.Entity<CartDetail>().Ignore(c => c.ShoppingCart);
+
+        base.OnModelCreating(modelBuilder);
     }
 
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<Furniture> Furnitures { get; set; }
-    public DbSet<TypeOfFurniture> TypeOfFurnitures { get; set; }
-    public DbSet<FurnitureFeature> FurnitureFeatures { get; set; }
-    public DbSet<CartDetail> CartDetails { get; set; }
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<OrderDetail> OrderDetails { get; set; }
-    public DbSet<ShoppingCart> ShoppingCarts { get; set; }
 
 
+    public class CategoryConfiguration : IEntityTypeConfiguration<Category>
+    {
+        public void Configure(EntityTypeBuilder<Category> builder)
+        {
+            builder.HasKey(c => c.Id);
+            builder.Property(c => c.Name).HasMaxLength(40).IsRequired();
+            builder.Property(c => c.Image).IsRequired();
+            builder.Property(c => c.CreatedAt).HasDefaultValueSql("GETUTCDATE()").IsRequired();
+            builder.Property(c => c.UpdatedAt);
+            builder.HasMany(c => c.TypeOfFurnitures).WithOne(t => t.Category).HasForeignKey(t => t.CategoryId);
+        }
+    }
 
+    public class FurnitureConfiguration : IEntityTypeConfiguration<Furniture>
+    {
+        public void Configure(EntityTypeBuilder<Furniture> builder)
+        {
+            builder.HasKey(f => f.Id);
+            builder.Property(f => f.Name).HasMaxLength(100).IsRequired();
+            builder.Property(f => f.Description).IsRequired();
+            builder.Property(f => f.UniqueId).IsRequired();
+            builder.Property(f => f.Price).IsRequired();
+            builder.Property(f => f.CreatedAt).HasDefaultValueSql("GETUTCDATE()").IsRequired();
+            builder.Property(f => f.UpdatedAt);
+            builder.Property(f => f.IsDeleted).HasDefaultValue(false).IsRequired();
+            builder.Property(f => f.Image).HasMaxLength(100).IsRequired();
+            builder.HasOne(f => f.TypeOfFurniture).WithMany(t => t.Furnitures).HasForeignKey(f => f.TypeOfFurnitureId);
+            builder.HasMany(f => f.FurnitureFeatures).WithOne(ff => ff.Furniture).HasForeignKey(ff => ff.FurnitureId);
+            builder.HasMany(f => f.OrderDetail).WithOne(od => od.Furniture).HasForeignKey(od => od.FurnitureId);
+            builder.HasMany(f => f.CartDetail).WithOne(cd => cd.Furniture).HasForeignKey(cd => cd.FurnitureId);
+        }
+    }
 
-    #region
-    //protected override void OnModelCreating(ModelBuilder modelBuilder)
-    //{
-    //    modelBuilder.ApplyConfiguration(new CategoryConfiguration());
-    //    modelBuilder.ApplyConfiguration(new FurnitureConfiguration());
-    //    modelBuilder.ApplyConfiguration(new FurnitureFeatureConfiguration());
-    //    modelBuilder.ApplyConfiguration(new TypeOfFurnitureConfiguration());
-    //    modelBuilder.ApplyConfiguration(new FurnitureCategoryConfiguration());
+    public class FurnitureFeatureConfiguration : IEntityTypeConfiguration<FurnitureFeature>
+    {
+        public void Configure(EntityTypeBuilder<FurnitureFeature> builder)
+        {
+            builder.HasKey(ff => ff.Id);
+            builder.Property(ff => ff.Name).IsRequired();
+            builder.Property(ff => ff.Value).IsRequired();
+            builder.Property(ff => ff.CreatedAt).HasDefaultValueSql("GETUTCDATE()").IsRequired();
+            builder.Property(ff => ff.UpdatedAt);
+        }
+    }
 
-    //    // Additional configurations or overrides can be added here.
+    public class TypeOfFurnitureConfiguration : IEntityTypeConfiguration<TypeOfFurniture>
+    {
+        public void Configure(EntityTypeBuilder<TypeOfFurniture> builder)
+        {
+            builder.HasKey(t => t.Id);
+            builder.Property(t => t.Image).IsRequired();
+            builder.Property(t => t.CreatedAt).HasDefaultValueSql("GETUTCDATE()").IsRequired();
+            builder.Property(t => t.UpdatedAt);
+            builder.Property(t => t.IsDeleted).HasDefaultValue(false).IsRequired();
+            builder.HasOne(t => t.Category).WithMany(c => c.TypeOfFurnitures).HasForeignKey(t => t.CategoryId);
+        }
+    }
 
-    //    base.OnModelCreating(modelBuilder);
-    //}
-    //public class FurnitureCategoryConfiguration : IEntityTypeConfiguration<FurnitureCategory>
-    //{
-    //    public void Configure(EntityTypeBuilder<FurnitureCategory> builder)
-    //    {
-    //        builder.HasKey(fc => new { fc.FurnitureId, fc.CategoryId });
+    public class ShoppingCartConfiguration : IEntityTypeConfiguration<ShoppingCart>
+    {
+        public void Configure(EntityTypeBuilder<ShoppingCart> builder)
+        {
+            builder.HasNoKey();
+            builder.HasKey(sc => sc.Id);
+            builder.Property(sc => sc.UserId);
+            builder.Property(sc => sc.IsDeleted).HasDefaultValue(false).IsRequired();
+        }
+    }
 
-    //        builder.HasOne(fc => fc.Furniture)
-    //            .WithMany()
-    //            .HasForeignKey(fc => fc.FurnitureId)
-    //            .OnDelete(DeleteBehavior.Cascade); // Adjust the deletion behavior as needed
+    public class OrderDetailConfiguration : IEntityTypeConfiguration<OrderDetail>
+    {
+        public void Configure(EntityTypeBuilder<OrderDetail> builder)
+        {
+            builder.HasKey(od => od.Id);
+            builder.Property(od => od.OrderId).IsRequired();
+            builder.Property(od => od.FurnitureId).IsRequired();
+            builder.Property(od => od.Quantity).IsRequired();
+            builder.Property(od => od.UnitPrice).IsRequired();
+        }
+    }
 
-    //        builder.HasOne(fc => fc.Category)
-    //            .WithMany()
-    //            .HasForeignKey(fc => fc.CategoryId)
-    //            .OnDelete(DeleteBehavior.Cascade); // Adjust the deletion behavior as needed
-    //    }
+    public class OrderConfiguration : IEntityTypeConfiguration<Order>
+    {
+        public void Configure(EntityTypeBuilder<Order> builder)
+        {
+            builder.HasNoKey();
+            builder.HasKey(o => o.Id);
+            builder.Property(o => o.UserId);
+            builder.Property(o => o.OrderStatus).IsRequired();
+            builder.Property(o => o.IsDeleted).HasDefaultValue(false).IsRequired();
+            builder.Property(o => o.CreatedAt).HasDefaultValueSql("GETUTCDATE()").IsRequired();
+            builder.HasMany(o => o.OrderDetail).WithOne(od => od.Order).HasForeignKey(od => od.OrderId);
+        }
+    }
 
-    //}
-
-    //public class CategoryConfiguration : IEntityTypeConfiguration<Category>
-    //{
-    //    public void Configure(EntityTypeBuilder<Category> builder)
-    //    {
-    //        builder.HasKey(c => c.TypeOfFurnitureId);
-
-    //        builder.Property(c => c.Name)
-    //            .IsRequired();
-
-    //        builder.HasOne(c => c.TypeOfFurniture)
-    //            .WithMany()
-    //            .HasForeignKey(c => c.TypeOfFurnitureId)
-    //            .OnDelete(DeleteBehavior.Restrict);
-    //    }
-    //}
-
-    //public class FurnitureConfiguration : IEntityTypeConfiguration<Furniture>
-    //{
-    //    public void Configure(EntityTypeBuilder<Furniture> builder)
-    //    {
-    //        builder.HasKey(f => f.FurnitureFeatureId);
-
-    //        builder.Property(f => f.Name)
-    //            .IsRequired();
-
-    //        builder.Property(f => f.Price)
-    //            .HasColumnType("decimal(18, 2)")
-    //            .IsRequired();
-
-    //        builder.Property(f => f.Image)
-    //            .IsRequired();
-
-    //        builder.HasOne(f => f.FurnitureFeature)
-    //            .WithMany()
-    //            .HasForeignKey(f => f.FurnitureFeatureId)
-    //            .OnDelete(DeleteBehavior.Restrict);
-    //    }
-    //}
-
-    //public class FurnitureFeatureConfiguration : IEntityTypeConfiguration<FurnitureFeature>
-    //{
-    //    public void Configure(EntityTypeBuilder<FurnitureFeature> builder)
-    //    {
-    //        builder.HasKey(ff => ff.Id);
-
-    //        builder.Property(ff => ff.Name)
-    //            .IsRequired(false);
-
-    //        builder.Property(ff => ff.Value)
-    //            .IsRequired(false);
-
-    //        // Assuming that FurnitureFeature has a self-referencing relationship (e.g., parent-child)
-    //        builder.HasMany(ff => ff.FurnitureFeatures)
-    //            .WithOne()
-    //            .HasForeignKey(ff => ff.Id)
-    //            .IsRequired(false)
-    //            .OnDelete(DeleteBehavior.Restrict);
-    //    }
-    //}
-
-    //public class TypeOfFurnitureConfiguration : IEntityTypeConfiguration<TypeOfFurniture>
-    //{
-    //    public void Configure(EntityTypeBuilder<TypeOfFurniture> builder)
-    //    {
-    //        builder.HasKey(tof => tof.FurnitureId);
-
-    //        builder.Property(tof => tof.Name)
-    //            .IsRequired();
-
-    //        builder.HasOne(tof => tof.Furniture)
-    //            .WithOne()
-    //            .HasForeignKey<TypeOfFurniture>(tof => tof.FurnitureId)
-    //            .OnDelete(DeleteBehavior.Restrict);
-    //    }
-    //}
-    #endregion
+    public class CartDetailConfiguration : IEntityTypeConfiguration<CartDetail>
+    {
+        public void Configure(EntityTypeBuilder<CartDetail> builder)
+        {
+            builder.HasKey(cd => cd.Id);
+            builder.Property(cd => cd.ShoppingCartId).IsRequired();
+            builder.Property(cd => cd.FurnitureId).IsRequired();
+            builder.Property(cd => cd.Quantity).IsRequired();
+            builder.Property(cd => cd.UnitPrice).IsRequired();
+        }
+    }
 
 }
+
+
+
+
+

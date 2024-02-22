@@ -6,10 +6,9 @@ namespace SelenMebel.Domain.Entities;
 [Table("ShoppingCart")]
 public class ShoppingCart
 {
-    public long Id { get; set; }
+	public long Id { get; set; }
 
-    [Required]
-    public string UserId { get; set; }
-    public bool IsDeleted { get; set; } = false;
-    public ICollection<CartDetail> CartDetails { get; set; }
+	public string UserId { get; set; }
+	public bool IsDeleted { get; set; } = false;
+	public ICollection<CartDetail> CartDetails { get; set; }
 }

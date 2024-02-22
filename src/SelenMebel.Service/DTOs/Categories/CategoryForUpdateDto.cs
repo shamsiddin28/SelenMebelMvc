@@ -1,10 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace SelenMebel.Service.DTOs.Categories;
 
 public class CategoryForUpdateDto
 {
-    public string Name { get; set; }
-    public IFormFile Image { get; set; }
-    public long TypeOfFurnitureId { get; set; }
+	[Required, MaxLength(40)]
+	public string Name { get; set; }
+
+	[Required]
+	public IFormFile Image { get; set; }
+
+	public string? ImagePath { get; set; }
 }

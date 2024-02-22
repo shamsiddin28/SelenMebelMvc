@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SelenMebel.Api.Extensions;
@@ -15,19 +14,18 @@ namespace SelenMebel.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
             builder.Services.AddDbContext<SelenMebelDbContext>(options =>
             {
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-
             // Fix the Cycle
-            //builder.Services.AddControllers()
-            //     .AddNewtonsoftJson(options =>
-            //     {
-            //         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            //     });
-
-
+            builder.Services.AddControllers()
+                 .AddNewtonsoftJson(options =>
+                 {
+                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                 });
 
             // Add services to the container.
 
@@ -36,6 +34,18 @@ namespace SelenMebel.Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin()
+                              .AllowAnyMethod()
+                              .AllowAnyHeader();
+                    });
+            });
+
 
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
@@ -56,7 +66,7 @@ namespace SelenMebel.Api
 
             var app = builder.Build();
 
-            WebHostEnviromentHelper.WebRootPath = Path.GetFullPath("wwwroot");
+            WebHostEnviromentHelper.WebRootPath = "C:\\Users\\shams\\Downloads\\SelenMebel-dev\\SelenMebel-dev\\src\\SelenMebelMVC\\wwwroot\\";
 
             if (app.Services.GetService<IHttpContextAccessor>() != null)
                 HttpContextHelper.Accessor = app.Services.GetRequiredService<IHttpContextAccessor>();
@@ -68,7 +78,7 @@ namespace SelenMebel.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseCors();
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

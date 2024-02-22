@@ -1,0 +1,82 @@
+﻿@page
+@model IEnumerable<SelenMebel.Service.DTOs.Furnitures.FurnitureForResultDto>
+@{
+}
+
+<h2 class="text-center mb-5">List of Furnitures</h2>
+
+<div class="row mb-5">
+	<div class="col">
+		<a class='btn btn-primary' href="/Admin/Pages/Create">New Furniture</a>
+	</div>
+
+	<div class="col">
+	</div>
+</div>
+
+
+
+<table class="table">
+	<tr>
+		<th>Id</th>
+		<th>Name</th>
+		<th>Price</th>
+		<th>Image</th>
+		<th>UniqueId</th>
+		<th>CreatedAt</th>
+	</tr>
+
+	@foreach (var furniture in Model)
+	{
+		<tr>
+			<td>@furniture.Id</td>
+			<td>@furniture.Name</td>
+			<td>@(furniture.Price)$</td>
+			<td><img src="/furniture images/@furniture.Image" width="100" /></td>
+			<td>@furniture.CreatedAt.ToString("dd/MM/yyyy")</td>
+			<td>@furniture.UniqueId</td>
+			<td style="white-space:nowrap">
+				<a class="btn btn-primary btn-sm" href="/Admin/Pages/Edit?id=@furniture.Id">Edit</a>
+				<a class="btn btn-danger btn-sm" href="/Admin/Pages/Delete?id=@furniture.Id">Delete</a>
+			</td>
+		</tr>
+	}
+</table>
+
+
+
+
+
+
+
+
+@* <h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <td><img src="/furniture images/@Furniture.Image" width="100" /></td>
+        </tr>
+    </thead>
+</table> *@
