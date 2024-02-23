@@ -10,7 +10,7 @@ public class TypeOfFurniture
 	public TypeOfSelen TypeOfSelen { get; set; }
 	public string Image { get; set; } = string.Empty;
 	
-	public DateTime CreatedAt { get; set; }	= DateTime.UtcNow;
+	public DateTime CreatedAt { get; set; }	= DateTime.UtcNow.AddHours(5);
 	public DateTime? UpdatedAt { get; set; }
 	public bool IsDeleted { get; set; }	= false;
 

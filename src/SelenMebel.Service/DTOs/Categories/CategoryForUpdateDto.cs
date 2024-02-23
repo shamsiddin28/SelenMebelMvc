@@ -10,6 +10,4 @@ public class CategoryForUpdateDto
 
 	[Required]
 	public IFormFile Image { get; set; }
-
-	public string? ImagePath { get; set; }
 }

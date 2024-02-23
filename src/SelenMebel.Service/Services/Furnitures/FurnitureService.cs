@@ -36,7 +36,7 @@ public class FurnitureService : IFurnitureService
 		var mapped = _mapper.Map<Furniture>(dto);
 
 		mapped.UniqueId = long.Parse(GenerateOtpDigits());
-		mapped.CreatedAt = DateTime.UtcNow;
+		mapped.CreatedAt = DateTime.UtcNow.AddHours(5);
 		mapped.Image = image;
 
 		var result = await _repository.InsertAsync(mapped);
@@ -79,7 +79,7 @@ public class FurnitureService : IFurnitureService
 
 		var mappedFurniture = this._mapper.Map(dto, furniture);
 
-		mappedFurniture.UpdatedAt = DateTime.UtcNow;
+		mappedFurniture.UpdatedAt = DateTime.UtcNow.AddHours(5);
 		mappedFurniture.Image = image;
 		mappedFurniture.UniqueId = long.Parse(GenerateOtpDigits());
 

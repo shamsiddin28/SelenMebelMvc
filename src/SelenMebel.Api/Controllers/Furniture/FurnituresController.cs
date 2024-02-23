@@ -22,9 +22,9 @@ namespace SelenMebel.Api.Controllers.Furniture
 		public async Task<IActionResult> GetAllAsync()
 			=> Ok(await this._furnitureService.RetrieveAllAsync());
 
-		//[HttpGet("{id}")]
-		//public async Task<IActionResult> GetAsync([FromRoute(Name = "id")] long id)
-		//    => Ok(await this._furnitureService.RetrieveByIdAsync(id));
+		[HttpGet("{id:long}")]
+		public async Task<IActionResult> GetAsync([FromRoute(Name = "id")] long id)
+			=> Ok(await this._furnitureService.RetrieveByIdAsync(id));
 
 		[HttpGet("{unique-id}")]
 		public async Task<IActionResult> GetUniqueAsync([FromRoute(Name = "unique-id")] long id)

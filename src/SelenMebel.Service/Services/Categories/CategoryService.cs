@@ -34,7 +34,7 @@ public class CategoryService : ICategoryService
 		var image = await MediaHelper.UploadFile(dto.Image, "CategoryImages");
 
 		var mappedCategory = _mapper.Map<Category>(dto);
-		mappedCategory.CreatedAt = DateTime.UtcNow;
+		mappedCategory.CreatedAt = DateTime.UtcNow.AddHours(5);
 		mappedCategory.Image = image;
 
 		var result = await _repository.InsertAsync(mappedCategory);
@@ -53,9 +53,8 @@ public class CategoryService : ICategoryService
 			throw new SelenMebelException(404, "Category is not found !");
 
 		var image = await MediaHelper.UploadFile(dto.Image, "CategoryImages");
-		dto.ImagePath = image;
 		var mappedCategory = this._mapper.Map(dto, category);
-		mappedCategory.UpdatedAt = DateTime.UtcNow;
+		mappedCategory.UpdatedAt = DateTime.UtcNow.AddHours(5);
 		mappedCategory.Image = image;
 
 		var result = await this._repository.UpdateAsync(mappedCategory);

@@ -45,7 +45,7 @@ public class FurnitureFeatureService : IFurnitureFeatureService
 			throw new SelenMebelException(409, "FurnitureFeature already exists !");
 
 		var mapped = _mapper.Map<FurnitureFeature>(dto);
-		mapped.CreatedAt = DateTime.UtcNow;
+		mapped.CreatedAt = DateTime.UtcNow.AddHours(5);
 
 		var result = await _furnitureFeatureRepository.InsertAsync(mapped);
 
@@ -70,7 +70,7 @@ public class FurnitureFeatureService : IFurnitureFeatureService
 
 
 		var mappedFurnitureFeature = this._mapper.Map(dto, addFurnitureFeature);
-		mappedFurnitureFeature.UpdatedAt = DateTime.UtcNow;
+		mappedFurnitureFeature.UpdatedAt = DateTime.UtcNow.AddHours(5);
 
 		await _furnitureFeatureRepository.UpdateAsync(mappedFurnitureFeature);
 

@@ -51,7 +51,7 @@ public class TypeOfFurnitureService : ITypeOfFurnitureService
 		var image = await MediaHelper.UploadFile(dto.Image, "TypeOfFurnitureImages");
 
 		var mapped = _mapper.Map<TypeOfFurniture>(dto);
-		mapped.CreatedAt = DateTime.UtcNow;
+		mapped.CreatedAt = DateTime.UtcNow.AddHours(5);
 		mapped.Image = image;
 
 		var result = await _typeOfFurnitureRepository.InsertAsync(mapped);
@@ -81,7 +81,7 @@ public class TypeOfFurnitureService : ITypeOfFurnitureService
 		var image = await MediaHelper.UploadFile(dto.Image, "TypeOfFurnitureImages");
 
 		var mappedTypeOfFurniture = _mapper.Map(dto, addTypeOfFurniture);
-		mappedTypeOfFurniture.UpdatedAt = DateTime.UtcNow;
+		mappedTypeOfFurniture.UpdatedAt = DateTime.UtcNow.AddHours(5);
 		mappedTypeOfFurniture.Image = image;
 
 		await _typeOfFurnitureRepository.UpdateAsync(mappedTypeOfFurniture);

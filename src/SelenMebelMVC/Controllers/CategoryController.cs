@@ -85,8 +85,16 @@ namespace SelenMebelMVC.Controllers
             {
                 return RedirectToAction("Index");
             }
+            else if (model.Image == null)
+            {
+                ModelState.AddModelError("FurnitureCreationDto.Image", "The image file is required");
+            }
+            else if (model.Name == null)
+            {
+                ModelState.AddModelError("FurnitureCreationDto.Name", "The name is required");
+            }
 
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && model.Image != null && model.Name != null)
             {
                 var apiClient = _httpClientFactory.CreateClient("client");
                 var apiUrl = apiClient.BaseAddress + $"api/Categories/{id}";
@@ -239,7 +247,7 @@ namespace SelenMebelMVC.Controllers
                 HttpResponseMessage response = apiClient.DeleteAsync(apiUrl).Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["SuccessMessage"] = "Category is Deleted Successfully !";
+                    TempData["SuccessMessage"] = $"{id}th-Id Category is Deleted Successfully !";
                     return RedirectToAction("Index");
                 }
                 else

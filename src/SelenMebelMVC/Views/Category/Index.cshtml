@@ -52,6 +52,12 @@ else if (TempData["ErrorMessage"] != null)
 				@Html.DisplayNameFor(model => model.Image)
 			</th>
 			<th>
+				@Html.DisplayNameFor(model => model.CreatedAt)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.UpdatedAt)
+			</th>
+			<th>
 				Action
 			</th>
 		</tr>
@@ -67,6 +73,12 @@ else if (TempData["ErrorMessage"] != null)
 					</td>
 					<td>
 						<img src="~/CategoryImages/Images/@category.Image" alt="" width=100 />
+					</td>
+					<td>
+						@Html.DisplayFor(model => category.CreatedAt)
+					</td>
+					<td>
+						@Html.DisplayFor(model => category.UpdatedAt)
 					</td>
 					<td style="white-space:nowrap">
 						<div class="btn-group btn-group-sm">

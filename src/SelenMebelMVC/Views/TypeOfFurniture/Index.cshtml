@@ -5,6 +5,33 @@
 
 <h3 class="text-center mb-5">@ViewData["Title"]</h3>
 
+@if (TempData["InfoMessage"] != null)
+{
+	<div class='alert alert-info alert-dismissible fade show' role='alert'>
+		<strong>Information ! </strong> @TempData["InfoMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
+else if (TempData["SuccessMessage"] != null)
+{
+	<div class='alert alert-success alert-dismissible fade show' role='alert'>
+		<strong>Success ! </strong> @TempData["SuccessMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
+else if (TempData["ErrorMessage"] != null)
+{
+	<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+		<strong>Error ! </strong> @TempData["ErrorMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
 
 <div class="row mb-5">
 	<div class="col">
@@ -29,6 +56,12 @@
 				@Html.DisplayNameFor(model => model.Image)
 			</th>
 			<th>
+				@Html.DisplayNameFor(model => model.CreatedAt)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.UpdatedAt)
+			</th>
+			<th>
 				Action
 			</th>
 		</tr>
@@ -47,6 +80,12 @@
 					</td>
 					<td>
 						<img src="~/TypeOfFurnitureImages/Images/@typeOfFurniture.Image" alt="" width=100 />
+					</td>
+					<td>
+						@Html.DisplayFor(model => typeOfFurniture.CreatedAt)
+					</td>
+					<td>
+						@Html.DisplayFor(model => typeOfFurniture.UpdatedAt)
 					</td>
 					<td style="white-space:nowrap">
 						<div class="btn-group btn-group-sm">
