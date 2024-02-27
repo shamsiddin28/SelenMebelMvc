@@ -1,124 +1,141 @@
 ﻿@using SelenMebel.Service.DTOs.Furnitures;
-@model FurnitureForResultDto
+@using SelenMebel.Domain.Enums;
+@using SelenMebelMVC.Models;
+
+@model FurnitureForUpdateDto;
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Furniture";
 }
+
+<!-- Modal -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>Do you want to add new TypeOfFurniture? Click <a href="https://localhost:7005/TypeOfFurniture/Create">here</a></p>
+    </div>
+</div>
+
 
 <div class="row">
     <div class="col-md-8 mx-auto rounded border p-3">
-        <h2 class="text-center mb-5">Edit Furniture</h2>
-            <form asp-action="Edit" enctype="multipart/form-data">
+        <h2 class="text-center mb-5">@ViewData["Title"]</h2>
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="row mb-3">
-                        <label asp-for="Id" class="col-sm-4 col-form-label">Id</label>
-                        <div class="col-sm-8">
-                        <input asp-for="Id" class="form-control" disabled />
-                    <span asp-validation-for="Id" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label class="col-sm-4 col-form-label">Category</label>
-                        <div class="col-sm-8">
-                            <select id="mySelect" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container">
-                                @{
-                                    var categoryy = ViewBag.Category;
-                                    var categories = ViewBag.Categories;
-                                    <option value="@categoryy.Id.ToString()">@categoryy.Name.ToString()</option>
-                                    foreach (var category in categories)
-                                    {
-                                        <option value="@category.Id.ToString()">@category.Name.ToString()</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                <label class="col-sm-4 col-form-label" asp-for="TypeOfFurniture.Id" id="typeOfFurniture">TypeOfFurniture</label>
-                        <div class="col-sm-8">
-                            <select asp-for="TypeOfFurniture.Id" id="typeOfSelenSelect" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container">
-                                @{
-                                    var typeOf = Model.TypeOfFurniture;
-                                    var optionText = "";
-                                        @switch ((int)typeOf.TypeOfSelen)
-                                        {
-                                            case 1:
-                                                optionText = "HiTech";
-                                                break;
-                                            case 2:
-                                                optionText = "Classic";
-                                                break;
-                                            case 3:
-                                                optionText = "Royal";
-                                                break;
-                                            case 4:
-                                                optionText = "None";
-                                                break;
-                                            default:
-                                                optionText = "Unknown";
-                                                break;
-                                        }
-                                        <option value="@Model.TypeOfFurniture.Id">@optionText</option>
-                                        }
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label asp-for="Name" class="col-sm-4 col-form-label">Name</label>
-                        <div class="col-sm-8">
-                            <input asp-for="Name" class="form-control" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
-                        </div>
-                    </div> 
-                    <div class="row mb-3">
-                        <label asp-for="Description" class="col-sm-4 col-form-label">Description</label>
-                        <div class="col-sm-8">
-                            <textarea asp-for="Description" class="form-control"></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label asp-for="UniqueId" class="col-sm-4 col-form-label">UniqueId</label>
-                        <div class="col-sm-8">
-                            <input asp-for="UniqueId" class="form-control" disabled />
-                            <span asp-validation-for="UniqueId" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label asp-for="Price" class="col-sm-4 col-form-label">Price</label>
-                        <div class="col-sm-8">
-                            <input asp-for="Price" class="form-control" />
-                            <span asp-validation-for="Price" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label class="col-sm-4 col-form-label">Old Image</label>
-                        <div class="col-sm-8">
-                            <img src="~/FurnitureImages/Images/@Model.Image" alt="" width=200 />
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label class="col-sm-4 col-form-label" asp-for="Image">New Image</label>
-                        <div class="col-sm-8">
-                            <input class="form-control" type="file" asp-for="Image">
-                            <span asp-validation-for="Image" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label class="col-sm-4 col-form-label">CreatedAt</label>
-                        <div class="col-sm-8">
-                            <input class="form-control" type="datetime" asp-for="CreatedAt" disabled>
-                            <span asp-validation-for="CreatedAt" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="offset-sm-4 col-sm-4 d-grid">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                        </div>  
-                        <div class="col-sm-4 d-grid">
-                            <a class="btn btn-outline-primary" href="/Furniture/Index" role="button">Cancel</a>
-                        </div>
-                    </div>
-            </form>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Id</label>
+                <div class="col-sm-8">
+                    <input class="form-control" value="@ViewBag.Id" disabled />
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Category</label>
+                <div class="col-sm-8">
+                    <select id="mySelect" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container">
+                        @{
+                            var categoryy = ViewBag.Category;
+                            var categories = ViewBag.Categories;
+                            <option value="@categoryy.Id.ToString()">@categoryy.Name.ToString()</option>
+                            foreach (var category in categories)
+                            {
+                                <option value="@category.Id.ToString()">@category.Name.ToString()</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label" asp-for="TypeOfFurnitureId" id="typeOfFurniture">TypeOfFurniture</label>
+                <div class="col-sm-8">
+                    <select asp-for="TypeOfFurnitureId" id="typeOfSelenSelect" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container" required>
+                        @{
+                            var typeOf = ViewBag.TypeOfFurniture;
+                            var optionText = "";
+                            @switch ((int)typeOf.TypeOfSelen)
+                            {
+                                case 1:
+                                    optionText = "HiTech";
+                                    break;
+                                case 2:
+                                    optionText = "Classic";
+                                    break;
+                                case 3:
+                                    optionText = "Royal";
+                                    break;
+                                case 4:
+                                    optionText = "None";
+                                    break;
+                                default:
+                                    optionText = "Unknown";
+                                    break;
+                            }
+                            <option value="@typeOf.Id">@optionText</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <button id="myBtn">Add New TypeOfFurniture</button>
+
+            <div class="row mb-3">
+                <label asp-for="Name" class="col-sm-4 col-form-label"></label>
+                <div class="col-sm-8">
+                    <input asp-for="Name" class="form-control" value="@ViewBag.Name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Old Description</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" disabled>@ViewBag.Description</textarea>
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label asp-for="Description" class="col-sm-4 col-form-label"></label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" asp-for="Description"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">UniqueId</label>
+                <div class="col-sm-8">
+                    <input class="form-control" value="@ViewBag.UniqueId" disabled />
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label asp-for="Price" class="col-sm-4 col-form-label"></label>
+                <div class="col-sm-8">
+                    <input asp-for="Price" class="form-control" value="@ViewBag.Price" required />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Old Image</label>
+                <div class="col-sm-8">
+                    <img src="~/FurnitureImages/Images/@ViewBag.Image" alt="" width=200 />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label" asp-for="Image">Image</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="file" asp-for="Image" required>
+                    <span asp-validation-for="Image" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="offset-sm-4 col-sm-4 d-grid">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+                <div class="col-sm-4 d-grid">
+                    <a class="btn btn-outline-primary" href="/Furniture/Index" role="button">Cancel</a>
+                </div>
+            </div>
+
+        </form>
+
     </div>
 </div>
 
@@ -128,6 +145,8 @@
     }
 
     <script>
+        $('#myBtn').hide();
+
         document.getElementById('mySelect').onchange = function () {
             var selectedValue = this.value;
 
@@ -147,9 +166,13 @@
 
                     // Populate the select options with typeOfSelen enums
                     if (typeOfFurnitures.length === 0) {
-                        $('#typeOfSelenSelect').append(`<option value="Have not any TypeOfFurnitures"></option>`);
+                        $('#typeOfSelenSelect').append(`<option value="0">No Selected</option>`);
                         alert("For this category have not the typeOfFurnitures !")
+                        $('#myBtn').show();
                     } else {
+                        $('#myBtn').hide();
+
+                        $('#typeOfSelenSelect').append(`<option value="0">No Selected</option>`);
                         typeOfFurnitures.forEach(furniture => {
                             var typeOfSelen = furniture.typeOfSelen;
                             var typeOfFurnitureId = furniture.id; // "Id" sini olish
@@ -171,8 +194,7 @@
                                     optionText = 'Unknown';
                             }
                             $('#typeOfSelenSelect').append(`<option value="${typeOfFurnitureId}">${optionText}</option>`);
-                            console.log(optionText)
-                            console.log(typeOfFurnitureId)
+                            console.log(typeOfFurnitureId, optionText)
                         });
                     }
                 })
@@ -181,4 +203,62 @@
                 });
         };
     </script>
+
+    <script>
+
+        // Show the modal dialog when the button is clicked
+        document.getElementById('myBtn').onclick = function () {
+            document.getElementById('myModal').style.display = 'block';
+        }
+
+        // Close the modal when the close button is clicked
+        var closeBtn = document.getElementsByClassName('close')[0];
+        closeBtn.onclick = function () {
+            document.getElementById('myModal').style.display = 'none';
+        }
+
+        // Close the modal when the user clicks outside of it
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('myModal')) {
+                document.getElementById('myModal').style.display = 'none';
+            }
+        }
+    </script>
 }
+
+<style>
+    /* Modal styles */
+    .modal {
+        display: none;
+        /* Initially hidden */
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>

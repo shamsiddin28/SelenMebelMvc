@@ -119,9 +119,18 @@ else if (TempData["ErrorMessage"] != null)
 			@foreach (var furniture in Model)
 			{
 				<tr>
-					<td>
-						@Html.DisplayFor(model => furniture.Name)
-					</td>
+					@if (!string.IsNullOrEmpty(furniture.Name))
+					{
+						<td>
+							@Html.DisplayFor(model => furniture.Name)
+						</td>
+					}
+					else
+					{
+						<td>
+							<span style="color: red;">Name has no value !</span>
+						</td>
+					}
 					<td>
 						@Html.DisplayFor(model => furniture.TypeOfFurniture.Category.Name)
 					</td>
@@ -131,9 +140,18 @@ else if (TempData["ErrorMessage"] != null)
 					<td>
 						<img src="~/FurnitureImages/Images/@furniture.Image" alt="" width=100 />
 					</td>
-					<td>
-						@Html.DisplayFor(model => furniture.Description)
-					</td>
+					@if (!string.IsNullOrEmpty(furniture.Description))
+					{
+						<td>
+							@Html.DisplayFor(model => furniture.Description)
+						</td>
+					}
+					else
+					{
+						<td>
+							<span style="color: red;">Description has no value !</span>
+						</td>
+					}
 					<td>
 						@Html.DisplayFor(model => furniture.UniqueId)
 					</td>
@@ -150,6 +168,8 @@ else if (TempData["ErrorMessage"] != null)
 						<div class="btn-group btn-group-sm">
 							<a asp-action="Edit" asp-route-id="@furniture.Id" class="btn btn-primary btn-sm">Edit</a>
 							<a asp-action="Delete" asp-route-id="@furniture.Id" class="btn btn-danger btn-sm">Delete</a>
+							<a asp-action="Details" asp-route-id="@furniture.Id" class="btn btn-primary btn-sm">Details</a>
+							<a asp-action="CreateFurnitureFeature" asp-route-id="@furniture.Id" class="btn btn-success btn-sm">AddFeature</a>
 						</div>
 					</td>
 				</tr>

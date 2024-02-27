@@ -23,13 +23,27 @@
                 @Html.DisplayNameFor(model => model.Name)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Name)
+                @if (!string.IsNullOrEmpty(Model.Name))
+                {
+                    @Html.DisplayFor(model => model.Name)
+                }
+                else
+                {
+                    <span style="color: red;">Name has no value !</span>
+                }
             </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Description)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Description)
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    @Html.DisplayFor(model => model.Description)
+                }
+                else
+                {
+                    <span style="color: red;">Description has no value !</span>
+                }
             </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.UniqueId)
@@ -48,6 +62,12 @@
             </dt>
             <dd class="col-sm-10">
                 @Html.DisplayFor(model => model.CreatedAt)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.UpdatedAt)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.UpdatedAt)
             </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Image)

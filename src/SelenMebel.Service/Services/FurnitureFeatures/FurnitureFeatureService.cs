@@ -96,6 +96,8 @@ public class FurnitureFeatureService : IFurnitureFeatureService
 	{
 		var furnitureFeatures = await _furnitureFeatureRepository.SelectAll()
 				  .Include(f => f.Furniture)
+				  .ThenInclude(typ => typ.TypeOfFurniture)
+				  .ThenInclude(c => c.Category)
 				  .AsNoTracking()
 				  .ToPagedListFurnitureFeature(@params)
 				  .ToListAsync();
@@ -108,7 +110,9 @@ public class FurnitureFeatureService : IFurnitureFeatureService
 		var furnitureFeature = await _furnitureFeatureRepository.SelectAll()
 				.Where(u => u.Id == id)
 				.Include(f => f.Furniture)
-				.AsNoTracking()
+                .ThenInclude(typ => typ.TypeOfFurniture)
+                .ThenInclude(c => c.Category)
+                .AsNoTracking()
 				.FirstOrDefaultAsync() ??
 					throw new SelenMebelException(404, "FurnitureFeature is not found !");
 

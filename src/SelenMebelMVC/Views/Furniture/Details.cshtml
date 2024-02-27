@@ -1,0 +1,186 @@
+﻿@using SelenMebel.Service.DTOs.Furnitures
+@model FurnitureForResultDto
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+@if (TempData["InfoMessage"] != null)
+{
+	<div class='alert alert-info alert-dismissible fade show' role='alert'>
+		<strong>Information ! </strong> @TempData["InfoMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
+else if (TempData["SuccessMessage"] != null)
+{
+	<div class='alert alert-success alert-dismissible fade show' role='alert'>
+		<strong>Success ! </strong> @TempData["SuccessMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
+else if (TempData["ErrorMessage"] != null)
+{
+	<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+		<strong>Error ! </strong> @TempData["ErrorMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
+
+<h1>Details</h1>
+
+<form asp-action="Details" method="get">
+    <div>
+        <h4>Furniture</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Id)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Id)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @if (!string.IsNullOrEmpty(Model.Name))
+                {
+                    @Html.DisplayFor(model => model.Name)
+                }
+                else
+                {
+                    <span style="color: red;">Name has no value !</span>
+                }
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TypeOfFurniture.TypeOfSelen)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TypeOfFurniture.TypeOfSelen)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TypeOfFurniture.Category)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TypeOfFurniture.Category.Name)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd class="col-sm-10">
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    @Html.DisplayFor(model => model.Description)
+                }
+                else
+                {
+                    <span style="color: red;">Description has no value !</span>
+                }
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.UniqueId)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.UniqueId)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Price)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Price)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.CreatedAt)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.UpdatedAt)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.UpdatedAt)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Image)
+            </dt>
+            <dd class="col-sm-10">
+                <img src="~/FurnitureImages/Images/@Model.Image" alt="" width=200 />
+            </dd>
+        </dl>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        <a asp-action="CreateFurnitureFeature" asp-route-id="@Model.Id" class="btn btn-success ">Add Feature</a>
+        <a class="btn btn-outline-primary" href="/Furniture/Index" role="button">Back to list</a>
+        
+    </div>
+	
+</form>
+
+<h3 class="text-center mb-5">Furniture Features</h3>
+<table class="table table-bordered table-responsive table-hover col-sm-10">
+	<thead>
+		<tr class="table-active">
+			<th>
+				@Html.DisplayName("Name")
+			</th>
+			<th>
+				@Html.DisplayName("Value")
+			</th>
+			<th>
+				@Html.DisplayName("CreatedAt")
+			</th>
+			<th>
+				@Html.DisplayName("UpdatedAt")
+			</th>
+			<th>
+				Action
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null && Model.FurnitureFeatures.Any())
+		{
+			@foreach (var furnitureFeature in Model.FurnitureFeatures)
+			{
+				<tr>
+					<td>
+						@Html.DisplayFor(model => furnitureFeature.Name)
+					</td>
+					<td>
+						@Html.DisplayFor(model => furnitureFeature.Value)
+					</td>
+					<td>
+						@Html.DisplayFor(model => furnitureFeature.CreatedAt)
+					</td>
+					<td>
+						@Html.DisplayFor(model => furnitureFeature.UpdatedAt)
+					</td>
+					<td style="white-space:nowrap">
+						<div class="btn-group btn-group-sm">
+							<a asp-action="EditFeature" asp-route-id="@furnitureFeature.Id" class="btn btn-primary btn-sm">Edit</a>
+                            <a asp-action="DeleteFeature" asp-route-id="@furnitureFeature.Id" class="btn btn-danger btn-sm">Delete</a>
+						</div>
+					</td>
+				</tr>
+			}
+		}
+		else
+		{
+			<tr>
+				<td colspan="8">
+					<div>
+						FurnitureFeatures not available in the database
+					</div>
+				</td>
+			</tr>
+		}
+	</tbody>
+
+</table>

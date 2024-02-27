@@ -13,10 +13,10 @@ public class FurnitureForUpdateDto
     [Required, Range(0.01, 1000000.00, ErrorMessage = "Value must be between 0.01 and 1000000.00")]
 	public decimal Price { get; set; }
 
-	[Required]
+	[Required(ErrorMessage = "The image is Required")]
 	public IFormFile Image { get; set; }
 
-	[Required]
+	[Required(ErrorMessage = "The TypeOfFurniture Id is Required")]
 	public long TypeOfFurnitureId { get; set; }
 
 }
