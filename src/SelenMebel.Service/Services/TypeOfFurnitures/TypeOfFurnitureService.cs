@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using SelenMebel.Domain.Entities;
-using SelenMebel.Service.Helpers;
 using Microsoft.EntityFrameworkCore;
-using SelenMebel.Data.IRepositories;
+using SelenMebel.Data.Interfaces.IRepositories;
+using SelenMebel.Domain.Configurations;
+using SelenMebel.Domain.Entities.Furnitures;
+using SelenMebel.Service.DTOs.TypeOfFurnitures;
 using SelenMebel.Service.Exceptions;
 using SelenMebel.Service.Extensions;
-using SelenMebel.Domain.Configurations;
-using SelenMebel.Service.DTOs.TypeOfFurnitures;
+using SelenMebel.Service.Helpers;
 using SelenMebel.Service.Interfaces.TypeOfFurnitures;
 
 namespace SelenMebel.Service.Services.TypeOfFurnitures;
@@ -17,8 +17,12 @@ public class TypeOfFurnitureService : ITypeOfFurnitureService
 	private readonly ICategoryRepository _categoryRepository;
 	private readonly IFurnitureRepository _furnitureRepository;
 	private readonly ITypeOfFurnitureRepository _typeOfFurnitureRepository;
+    private readonly string ASSETS_FOLDER;
+    private readonly string TYPEOFFURNITURE_FOLDER;
+    private readonly string RESOUCE_IMAGE_FOLDER;
 
-	public TypeOfFurnitureService(
+
+    public TypeOfFurnitureService(
 		IMapper mapper,
 		ITypeOfFurnitureRepository repository,
 		ICategoryRepository categoryRepository,
@@ -28,14 +32,17 @@ public class TypeOfFurnitureService : ITypeOfFurnitureService
 		_typeOfFurnitureRepository = repository;
 		_categoryRepository = categoryRepository;
 		_furnitureRepository = furnitureRepository;
-	}
+        ASSETS_FOLDER = WebHostEnviromentHelper.WebRootPath;
+        TYPEOFFURNITURE_FOLDER = "TypeOfFurnitureImages";
+        RESOUCE_IMAGE_FOLDER = Path.Combine(TYPEOFFURNITURE_FOLDER, "Images");
+    }
 
 	public async Task<TypeOfFurnitureForResultDto> CreateAsync(TypeOfFurnitureForCreationDto dto)
 	{
 		//Check is Category
-	   var category = await _categoryRepository.SelectAll()
-			   .Where(f => f.Id == dto.CategoryId)
-			   .FirstOrDefaultAsync();
+		var category = await _categoryRepository.SelectAll()
+				.Where(f => f.Id == dto.CategoryId)
+				.FirstOrDefaultAsync();
 
 		if (category is null)
 			throw new SelenMebelException(404, "Category is not found !");
@@ -59,7 +66,16 @@ public class TypeOfFurnitureService : ITypeOfFurnitureService
 		return _mapper.Map<TypeOfFurnitureForResultDto>(result);
 	}
 
-	public async Task<TypeOfFurnitureForResultDto> ModifyAsync(long id, TypeOfFurnitureForUpdateDto dto)
+    public async Task<byte[]> DownloadAsync(string imageName)
+    {
+        var imagePath = Path.Combine(ASSETS_FOLDER, RESOUCE_IMAGE_FOLDER, imageName);
+        if (File.Exists(imagePath))
+            return await File.ReadAllBytesAsync(imagePath);
+
+        throw new FileNotFoundException();
+    }
+
+    public async Task<TypeOfFurnitureForResultDto> ModifyAsync(long id, TypeOfFurnitureForUpdateDto dto)
 	{
 
 		// Check is Category
@@ -110,7 +126,19 @@ public class TypeOfFurnitureService : ITypeOfFurnitureService
 		return true;
 	}
 
-	public async Task<IEnumerable<TypeOfFurnitureForResultDto>> RetrieveAllAsync()
+	public async Task<IEnumerable<TypeOfFurnitureForResultDto>> RetrieveAllAsync(PaginationParams @params)
+	{
+		var typeOfFurnitures = await _typeOfFurnitureRepository.SelectAll()
+				  .Include(c => c.Category)
+				  .Include(c => c.Furnitures)
+				  .AsNoTracking()
+				  .ToPagedListTypeOfFurniture(@params)
+				  .ToListAsync();
+
+		return _mapper.Map<IEnumerable<TypeOfFurnitureForResultDto>>(typeOfFurnitures);
+	}
+
+	public async Task<IEnumerable<TypeOfFurnitureForResultDto>> RetrieveAllTypeOfFurnituresAsync()
 	{
 		var typeOfFurnitures = await _typeOfFurnitureRepository.SelectAll()
 				  .Include(c => c.Category)

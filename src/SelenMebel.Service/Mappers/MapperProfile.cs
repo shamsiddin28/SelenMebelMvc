@@ -1,13 +1,22 @@
 ﻿using AutoMapper;
+using MathNet.Numerics.Distributions;
 using SelenMebel.Domain.Entities;
-using SelenMebel.Service.DTOs.Orders;
-using SelenMebel.Service.DTOs.Categories;
-using SelenMebel.Service.DTOs.Furnitures;
+using SelenMebel.Domain.Entities.Admins;
+using SelenMebel.Domain.Entities.Carts;
+using SelenMebel.Domain.Entities.Categories;
+using SelenMebel.Domain.Entities.Furnitures;
+using SelenMebel.Domain.Entities.Orders;
+using SelenMebel.Service.DTOs.Admins;
 using SelenMebel.Service.DTOs.CartDetails;
+using SelenMebel.Service.DTOs.Categories;
+using SelenMebel.Service.DTOs.FurnitureFeatures;
+using SelenMebel.Service.DTOs.Furnitures;
 using SelenMebel.Service.DTOs.OrderDetails;
+using SelenMebel.Service.DTOs.Orders;
 using SelenMebel.Service.DTOs.ShoppingCarts;
 using SelenMebel.Service.DTOs.TypeOfFurnitures;
-using SelenMebel.Service.DTOs.FurnitureFeatures;
+using SelenMebel.Service.DTOs.Users;
+using SelenMebel.Service.ViewModels.UserViewModels;
 
 namespace SelenMebel.Service.Mappers;
 
@@ -54,5 +63,11 @@ public class MapperProfile : Profile
 		CreateMap<CartDetail, CartDetailForCreationDto>().ReverseMap();
 		CreateMap<CartDetail, CartDetailForResultDto>().ReverseMap();
 		CreateMap<CartDetail, CartDetailForUpdateDto>().ReverseMap();
-	}
+
+        CreateMap<AdminRegisterDto, Admin>().ReverseMap();
+        CreateMap<UserBaseViewModel, User>().ReverseMap();
+        CreateMap<UserViewModel, User>().ReverseMap();
+        CreateMap<UserRegisterDto, User>().ReverseMap();
+
+    }
 }

@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using SelenMebel.Service.Helpers;
-using SelenMebel.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using SelenMebel.Data.IRepositories;
+using SelenMebel.Data.Interfaces.IRepositories;
+using SelenMebel.Domain.Configurations;
+using SelenMebel.Domain.Entities.Furnitures;
+using SelenMebel.Service.DTOs.Furnitures;
 using SelenMebel.Service.Exceptions;
 using SelenMebel.Service.Extensions;
-using SelenMebel.Domain.Configurations;
-using SelenMebel.Service.DTOs.Furnitures;
+using SelenMebel.Service.Helpers;
 using SelenMebel.Service.Interfaces.Furnitures;
 
 namespace SelenMebel.Service.Services.Furnitures;
@@ -15,12 +15,18 @@ public class FurnitureService : IFurnitureService
 {
 	private readonly IMapper _mapper;
 	private readonly IFurnitureRepository _repository;
+    private readonly string ASSETS_FOLDER;
+    private readonly string FURNITURE_FOLDER;
+    private readonly string RESOUCE_IMAGE_FOLDER;
 
-	public FurnitureService(IFurnitureRepository repository, IMapper mapper)
+    public FurnitureService(IFurnitureRepository repository, IMapper mapper)
 	{
 		_repository = repository;
 		_mapper = mapper;
-	}
+        ASSETS_FOLDER = WebHostEnviromentHelper.WebRootPath;
+        FURNITURE_FOLDER = "FurnitureImages";
+        RESOUCE_IMAGE_FOLDER = Path.Combine(FURNITURE_FOLDER, "Images");
+    }
 
 	public async Task<FurnitureForResultDto> CreateAsync(FurnitureForCreationDto dto)
 	{
@@ -35,7 +41,7 @@ public class FurnitureService : IFurnitureService
 
 		var mapped = _mapper.Map<Furniture>(dto);
 
-		mapped.UniqueId = long.Parse(GenerateOtpDigits());
+		mapped.UniqueId = GenerateOtpDigits();
 		mapped.CreatedAt = DateTime.UtcNow.AddHours(5);
 		mapped.Image = image;
 
@@ -44,7 +50,16 @@ public class FurnitureService : IFurnitureService
 		return _mapper.Map<FurnitureForResultDto>(result);
 	}
 
-	public string GenerateOtpDigits()
+    public async Task<byte[]> DownloadAsync(string imageName)
+    {
+        var imagePath = Path.Combine(ASSETS_FOLDER, RESOUCE_IMAGE_FOLDER, imageName);
+        if (File.Exists(imagePath))
+            return await File.ReadAllBytesAsync(imagePath);
+
+        throw new FileNotFoundException();
+    }
+
+    public string GenerateOtpDigits()
 	{
 		string num = "0123456789";
 		int len = num.Length;
@@ -81,7 +96,7 @@ public class FurnitureService : IFurnitureService
 
 		mappedFurniture.UpdatedAt = DateTime.UtcNow.AddHours(5);
 		mappedFurniture.Image = image;
-		mappedFurniture.UniqueId = long.Parse(GenerateOtpDigits());
+		mappedFurniture.UniqueId = GenerateOtpDigits();
 
 		await this._repository.UpdateAsync(mappedFurniture);
 
@@ -109,7 +124,22 @@ public class FurnitureService : IFurnitureService
 		return true;
 	}
 
-	public async Task<IEnumerable<FurnitureForResultDto>> RetrieveAllAsync()
+	public async Task<IEnumerable<FurnitureForResultDto>> RetrieveAllAsync(PaginationParams @params)
+	{
+		var furnitures = await _repository.SelectAll()
+				  .Include(tof => tof.TypeOfFurniture)
+				  .ThenInclude(c => c.Category)
+				  .Include(fF => fF.FurnitureFeatures)
+				  .Include(cD => cD.CartDetail)
+				  .Include(oD => oD.OrderDetail)
+				  .AsNoTracking()
+				  .ToPagedListFurniture(@params)
+				  .ToListAsync();
+
+		return _mapper.Map<IEnumerable<FurnitureForResultDto>>(furnitures);
+	}
+
+	public async Task<IEnumerable<FurnitureForResultDto>> RetrieveAllFurnituresAsync()
 	{
 		var furnitures = await _repository.SelectAll()
 				  .Include(tof => tof.TypeOfFurniture)
@@ -139,18 +169,17 @@ public class FurnitureService : IFurnitureService
 		return _mapper.Map<FurnitureForResultDto>(byFurniture);
 	}
 
-	public async Task<FurnitureForResultDto> RetrieveByUniqueIdAsync(long uniqueId)
+	public async Task<FurnitureForResultDto> RetrieveByUniqueIdAsync(string uniqueId)
 	{
 		var byUniqueId = await _repository.SelectAll()
-				.Where(u => u.UniqueId == uniqueId)
+				.Where(u => u.UniqueId.ToLower() == uniqueId.ToLower())
 				.Include(tOF => tOF.TypeOfFurniture)
 				.Include(fF => fF.FurnitureFeatures)
 				.Include(cD => cD.CartDetail)
 				.Include(oD => oD.OrderDetail)
 				.AsNoTracking()
-				.FirstOrDefaultAsync();
-		if (byUniqueId is null)
-			throw new SelenMebelException(404, "Furniture is not found !");
+				.FirstOrDefaultAsync() ??
+					throw new SelenMebelException(404, "Furniture is not found !");
 
 		return _mapper.Map<FurnitureForResultDto>(byUniqueId);
 	}

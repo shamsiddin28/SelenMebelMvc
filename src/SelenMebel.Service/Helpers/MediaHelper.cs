@@ -16,9 +16,9 @@ public class MediaHelper
 			using (var fileStream = new FileStream(imageFilePath, FileMode.Create))
 			{
 				await file.CopyToAsync(fileStream);
-			}											
+			}
 		}
-		
+
 		return uniqueFileName;
 	}
 }

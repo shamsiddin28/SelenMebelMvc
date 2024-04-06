@@ -10,13 +10,13 @@ public class TypeOfFurnitureForResultDto
 	public long Id { get; set; }
 	public TypeOfSelen TypeOfSelen { get; set; }
 	public string Image { get; set; }
-    
+
 	[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow.AddHours(5);
+	public DateTime CreatedAt { get; set; } = DateTime.UtcNow.AddHours(5);
 
-    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-    public DateTime? UpdatedAt { get; set; }
+	[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+	public DateTime? UpdatedAt { get; set; }
 
-    public CategoryForResultDto Category { get; set; }
-	public ICollection<FurnitureForResultDto> Furnitures { get; set; }	
+	public CategoryForResultDto Category { get; set; }
+	public ICollection<FurnitureForResultDto> Furnitures { get; set; }
 }

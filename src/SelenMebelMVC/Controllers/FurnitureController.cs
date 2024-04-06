@@ -14,7 +14,7 @@ namespace SelenMebelMVC.Controllers
 {
 	public class FurnitureController : Controller
 	{
-		string baseURL = "https://localhost:7200/api/";
+		public string baseURL = "https://selenmebelapi20240307024627.azurewebsites.net/api/";
 
 		private readonly IHttpClientFactory _httpClientFactory;
 
@@ -23,8 +23,38 @@ namespace SelenMebelMVC.Controllers
 			_httpClientFactory = httpClientFactory;
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> GetById([FromRoute(Name = "id")] long furnitureId)
+        public async Task DownloadAndSaveImageAsync(string imageName)
+        {
+
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    HttpResponseMessage response = await client.GetAsync(baseURL + $"Furnitures/DownloadByImageName?imageName={imageName}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string newImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "FurnitureImages", "Images", imageName);
+                        using (Stream contentStream = await response.Content.ReadAsStreamAsync(),
+                             fileStream = new FileStream(newImagePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                        {
+                            await contentStream.CopyToAsync(fileStream);
+                        }
+                    }
+                    else
+                    {
+                        TempData["InfoMessage"] = $"Failed to download image. Status code: {response.StatusCode}";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+                }
+            }
+        }
+
+        [HttpGet]
+		public async Task<IActionResult> GetById([FromRoute(Name = "unique-id")] long uniqueId)
 		{
 
 			using (var client = new HttpClient())
@@ -33,7 +63,7 @@ namespace SelenMebelMVC.Controllers
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-				HttpResponseMessage getData = await client.GetAsync($"Furnitures/{furnitureId}");
+				HttpResponseMessage getData = await client.GetAsync($"Furnitures/{uniqueId}");
 
 				if (getData.IsSuccessStatusCode)
 				{
@@ -51,7 +81,7 @@ namespace SelenMebelMVC.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Index(string searchBy, string searchValue)
+		public async Task<IActionResult> Index(string searchBy, string searchValue, int pageIndex = 1, int pageSize = 3)
 		{
 			var furnitureList = new List<FurnitureForResultDto>();
 			try
@@ -63,13 +93,31 @@ namespace SelenMebelMVC.Controllers
 					client.DefaultRequestHeaders.Accept.Clear();
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-					HttpResponseMessage getData = await client.GetAsync("Furnitures");
-
+					HttpResponseMessage getData = await client.GetAsync($"Furnitures/ByPagination?PageSize={pageSize}&PageIndex={pageIndex}");
+					HttpResponseMessage getAllFurnitures = await client.GetAsync($"Furnitures");
+					getData.EnsureSuccessStatusCode();
 
 					if (getData.IsSuccessStatusCode)
 					{
+						double totalItems = 0;
+						if (getData.Headers.TryGetValues("X-Total-Count", out var totalCountValues))
+						{
+							string totalCountString = totalCountValues?.FirstOrDefault();
+							totalItems = int.Parse(totalCountString);
+
+						}
 						string results = getData.Content.ReadAsStringAsync().Result;
 						furnitureList = JsonConvert.DeserializeObject<List<FurnitureForResultDto>>(results).OrderByDescending(f => f.Id).ToList();
+                        foreach (var item in furnitureList)
+                        {
+                            await DownloadAndSaveImageAsync(item.Image);
+                        }
+                        var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+						ViewData["TotalItems"] = totalItems;
+						ViewData["PageIndex"] = pageIndex;
+						ViewData["PageSize"] = pageSize;
+						ViewData["TotalPages"] = totalPages;
 
 						if (furnitureList.Count() == 0)
 						{
@@ -79,33 +127,111 @@ namespace SelenMebelMVC.Controllers
 						{
 							if (string.IsNullOrEmpty(searchValue))
 							{
-								TempData["InfoMessage"] = "Please provide the search value.";
+								//TempData["InfoMessage"] = "Please provide the search value.";
+
 								return View(furnitureList);
 							}
 							else
 							{
-								if (searchBy.ToLower() == "furniturename")
+								if (getAllFurnitures.IsSuccessStatusCode)
 								{
-									var searchByFurnitureName = furnitureList.Where(f => f.Name.ToLower().Contains(searchValue.ToLower()));
-									return View(searchByFurnitureName);
+									string resultFurnitures = getAllFurnitures.Content.ReadAsStringAsync().Result;
+									var allFurnitures = JsonConvert.DeserializeObject<List<FurnitureForResultDto>>(resultFurnitures);
+									ViewData["SearchBy"] = searchBy;
+									ViewData["SearchValue"] = searchValue;
+
+									for (int i = 1; i <= totalPages; i++)
+									{
+										var result = allFurnitures.Skip((i - 1) * pageSize).Take(pageSize);
+										if (searchBy.ToLower() == "uniqueid")
+										{
+											var searchByUniqueId = result.Where(f => f.UniqueId.ToString().ToLower().Contains(searchValue.ToLower()));
+											if (searchByUniqueId.Any())
+											{
+												ViewData["PageIndex"] = i;
+												ViewData["PageSize"] = pageSize;
+
+												return View(searchByUniqueId);
+											}
+											else
+											{
+												continue;
+											}
+										}
+										else if (searchBy.ToLower() == "price")
+										{
+											var searchByPrice = result.Where(f => f.Price.ToString().ToLower().Contains(searchValue.ToLower()));
+											if (searchByPrice.Any())
+											{
+												ViewData["PageIndex"] = i;
+												ViewData["PageSize"] = pageSize;
+
+												return View(searchByPrice);
+											}
+											else
+											{
+												continue;
+											}
+										}
+										else if (searchBy.ToLower() == "furniturename")
+										{
+											var searchByFurnitureName = result.Where(f => f.Name.ToLower().Contains(searchValue.ToLower()));
+											if (searchByFurnitureName.Any())
+											{
+												ViewData["PageIndex"] = i;
+												ViewData["PageSize"] = pageSize;
+
+												return View(searchByFurnitureName);
+											}
+											else
+											{
+												continue;
+											}
+										}
+										else if (searchBy.ToLower() == "categoryname")
+										{
+											var searchByCategoryName = result.Where(f => f.TypeOfFurniture.Category.Name.ToLower().Contains(searchValue.ToLower()));
+											if (searchByCategoryName.Any())
+											{
+												ViewData["PageIndex"] = i;
+												ViewData["PageSize"] = pageSize;
+
+												return View(searchByCategoryName);
+											}
+											else
+											{
+												continue;
+											}
+										}
+									}
+									if (furnitureList != null)
+									{
+										// Set pagination data in ViewData
+										ViewData["PageIndex"] = pageIndex;
+										ViewData["TotalItems"] = totalItems;
+										ViewData["PageSize"] = pageSize;
+										ViewData["TotalPages"] = totalPages;
+
+										return View(furnitureList);
+									}
 								}
-								else if (searchBy.ToLower() == "categoryname")
+								else
 								{
-									var searchByCategoryName = furnitureList.Where(f => f.TypeOfFurniture.Category.Name.ToLower().Contains(searchValue.ToLower()));
-									return View(searchByCategoryName);
-								}
-								else if (searchBy.ToLower() == "uniqueid")
-								{
-									var searchByUniqueId = furnitureList.Where(f => f.UniqueId.ToString().ToLower().Contains(searchValue.ToLower()));
-									return View(searchByUniqueId);
-								}
-								else if (searchBy.ToLower() == "price")
-								{
-									var searchByUniqueId = furnitureList.Where(f => f.Price.ToString().ToLower().Contains(searchValue.ToLower()));
-									return View(searchByUniqueId);
+									TempData["ErrorMessage"] = getAllFurnitures.ReasonPhrase.ToString();
+									return View(furnitureList);
+
 								}
 							}
 						}
+
+
+						// Set pagination data in ViewData
+						ViewData["PageIndex"] = pageIndex;
+						ViewData["TotalItems"] = totalItems;
+						ViewData["PageSize"] = pageSize;
+						ViewData["TotalPages"] = totalPages;
+
+
 						return View(furnitureList);
 					}
 					else
@@ -154,7 +280,7 @@ namespace SelenMebelMVC.Controllers
 
 			}
 		}
-
+			
 		[HttpPost]
 		public async Task<IActionResult> Create(FurnitureForCreationDto model)
 		{
@@ -263,6 +389,9 @@ namespace SelenMebelMVC.Controllers
 					ViewBag.Description = model.Description;
 					ViewBag.TypeOfFurniture = model.TypeOfFurniture;
 					ViewBag.Category = model.TypeOfFurniture.Category;
+					ViewBag.Category = model.TypeOfFurniture.Category;
+					ViewBag.CreatedAt = model.CreatedAt;
+					ViewBag.UpdatedAt = model.UpdatedAt;
 
 
 					string resultCategory = getCategories.Content.ReadAsStringAsync().Result;
@@ -525,10 +654,10 @@ namespace SelenMebelMVC.Controllers
 						}
 
 					}
-                    return View("CreateFurnitureFeature");
+					return View("CreateFurnitureFeature");
 
-                }
-                else
+				}
+				else
 				{
 					TempData["InfoMessage"] = "Please provide all the required fields";
 					return View("CreateFurnitureFeature", model);
@@ -564,7 +693,7 @@ namespace SelenMebelMVC.Controllers
 					ViewBag.Value = model.Value;
 					ViewBag.FurnitureId = model.Furniture.Id;
 
-					FurnitureFeatureForUpdateDto furnitureFeatureForUpdateDto= new FurnitureFeatureForUpdateDto();
+					FurnitureFeatureForUpdateDto furnitureFeatureForUpdateDto = new FurnitureFeatureForUpdateDto();
 					return View("EditFeature", furnitureFeatureForUpdateDto);
 				}
 				else
@@ -600,11 +729,11 @@ namespace SelenMebelMVC.Controllers
 
 				using (var multipartContent = new MultipartFormDataContent())
 				{
-					
+
 					multipartContent.Add(new StringContent(model.FurnitureId.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), "furnitureid");
 					multipartContent.Add(new StringContent(model.Name, Encoding.UTF8, MediaTypeNames.Text.Plain), "name");
 					multipartContent.Add(new StringContent(model.Value, Encoding.UTF8, MediaTypeNames.Text.Plain), "value");
-					
+
 					var response = await apiClient.PutAsync(apiUrl, multipartContent);
 					if (response.IsSuccessStatusCode)
 					{
@@ -635,67 +764,67 @@ namespace SelenMebelMVC.Controllers
 
 		}
 
-        [HttpGet]
-        public async Task<ViewResult> DeleteFeature(long id)
-        {
-            using (var client = new HttpClient())
-            {
-                FurnitureFeatureForResultDto model = new FurnitureFeatureForResultDto();
-                client.BaseAddress = new Uri(baseURL);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+		[HttpGet]
+		public async Task<ViewResult> DeleteFeature(long id)
+		{
+			using (var client = new HttpClient())
+			{
+				FurnitureFeatureForResultDto model = new FurnitureFeatureForResultDto();
+				client.BaseAddress = new Uri(baseURL);
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpResponseMessage getData = await client.GetAsync($"FurnitureFeatures/{id}");
+				HttpResponseMessage getData = await client.GetAsync($"FurnitureFeatures/{id}");
 
-                if (getData.IsSuccessStatusCode)
-                {
-                    string results = getData.Content.ReadAsStringAsync().Result;
-                    model = JsonConvert.DeserializeObject<FurnitureFeatureForResultDto>(results);
-                    
+				if (getData.IsSuccessStatusCode)
+				{
+					string results = getData.Content.ReadAsStringAsync().Result;
+					model = JsonConvert.DeserializeObject<FurnitureFeatureForResultDto>(results);
+
 					return View("DeleteFeature", model);
-                }
-                else
-                {
-                    return View("Index");
-                }
+				}
+				else
+				{
+					return View("Index");
+				}
 
-            }
-        }
+			}
+		}
 
-        [HttpPost, ActionName("DeleteFeature")]
-        public IActionResult DeleteFeatureConfirmed(long id)
-        {
+		[HttpPost, ActionName("DeleteFeature")]
+		public IActionResult DeleteFeatureConfirmed(long id)
+		{
 			if (id <= 0)
-            {
-                TempData["ErrorMessage"] = "FurnitureFeature not found !";
-                return RedirectToAction("Index");
-            }
+			{
+				TempData["ErrorMessage"] = "FurnitureFeature not found !";
+				return RedirectToAction("Index");
+			}
 
-            try
-            {
-                var apiClient = _httpClientFactory.CreateClient("client");
-                var apiUrl = apiClient.BaseAddress + $"api/FurnitureFeatures/{id}";
+			try
+			{
+				var apiClient = _httpClientFactory.CreateClient("client");
+				var apiUrl = apiClient.BaseAddress + $"api/FurnitureFeatures/{id}";
 
-                HttpResponseMessage response = apiClient.DeleteAsync(apiUrl).Result;
-                if (response.IsSuccessStatusCode)
-                {
+				HttpResponseMessage response = apiClient.DeleteAsync(apiUrl).Result;
+				if (response.IsSuccessStatusCode)
+				{
 
 					TempData["SuccessMessage"] = "FurnitureFeature is Deleted Successfully !";
-                    return RedirectToAction("Index");
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = response.ReasonPhrase;
-                    return RedirectToAction("Index");
-                }
+					return RedirectToAction("Index");
+				}
+				else
+				{
+					TempData["ErrorMessage"] = response.ReasonPhrase;
+					return RedirectToAction("Index");
+				}
 
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = ex.Message;
-                return RedirectToAction("Index");
-            }
-        }
+			}
+			catch (Exception ex)
+			{
+				TempData["ErrorMessage"] = ex.Message;
+				return RedirectToAction("Index");
+			}
+		}
 
-    }
+	}
 }

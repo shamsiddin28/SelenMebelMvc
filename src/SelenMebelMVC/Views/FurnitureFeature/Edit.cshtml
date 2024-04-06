@@ -11,6 +11,13 @@
         <form asp-action="Edit" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Id</label>
+                <div class="col-sm-8">
+                    <input class="form-control" value="@ViewBag.Id" disabled />
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
                 <label asp-for="FurnitureId" class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-8">
                     <input asp-for="FurnitureId" class="form-control" value="@ViewBag.FurnitureId" required />
@@ -29,6 +36,20 @@
                 <div class="col-sm-8">
                     <input asp-for="Value" class="form-control" value="@ViewBag.Value" required />
                     <span asp-validation-for="Value" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">CreatedAt</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="datetime" value="@ViewBag.CreatedAt" disabled>
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">UpdatedAt</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="datetime" value="@ViewBag.UpdatedAt" disabled>
+                    <span class="text-danger"></span>
                 </div>
             </div>
             <div class="row mb-3">

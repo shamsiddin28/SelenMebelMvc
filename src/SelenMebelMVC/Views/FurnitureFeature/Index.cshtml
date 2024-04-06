@@ -52,7 +52,7 @@ else if (TempData["ErrorMessage"] != null)
 			</tr>
 			<tr>
 				<td>
-					@Html.TextBox("searchValue", null, new { Class = "form-control", placeholder = "Enter Furniture or Category Name or UniqueId" })
+					@Html.TextBox("searchValue", null, new { Class = "form-control", placeholder = "Enter Feature or Furniture or Category Name or UniqueId" })
 				</td>
 				<td>
 					&nbsp;
@@ -65,7 +65,43 @@ else if (TempData["ErrorMessage"] != null)
 	}
 </div>
 
+<nav aria-label="Page navigation">
+	<ul class="pagination justify-content-center">
+		@{
+			var pageIndex = ViewData["PageIndex"] != null ? (int)ViewData["PageIndex"] : 1;
+			var pageSize = ViewData["PageSize"] != null ? (int)ViewData["PageSize"] : 10;
+			var totalItems = ViewData["TotalItems"];
+			var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
+			var searchBy = ViewData["SearchBy"];
+			var searchValue = ViewData["SearchValue"];
+		}
+
+		@if (totalPages > 1)
+		{
+			<li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=1&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">First</a>
+			</li>
+			<li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=@(pageIndex - 1)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Previous</a>
+			</li>
+
+			@for (var i = 1; i <= totalPages; i++)
+			{
+				<li class="page-item @(pageIndex == i ? "active" : "")" aria-current="page">
+					<a class="page-link" href="?pageIndex=@(i)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">@i</a>
+				</li>
+			}
+
+			<li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=@(pageIndex + 1)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Next</a>
+			</li>
+			<li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=@totalPages&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Last</a>
+			</li>
+		}
+	</ul>
+</nav>
 
 <table class="table table-bordered table-responsive table-hover">
 	<thead>

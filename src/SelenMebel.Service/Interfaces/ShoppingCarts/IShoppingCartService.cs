@@ -1,5 +1,4 @@
 ﻿using SelenMebel.Domain.Configurations;
-using SelenMebel.Service.DTOs.Furnitures;
 using SelenMebel.Service.DTOs.ShoppingCarts;
 
 namespace SelenMebel.Service.Interfaces.ShoppingCarts;

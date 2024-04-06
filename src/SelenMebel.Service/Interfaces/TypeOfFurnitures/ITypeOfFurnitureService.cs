@@ -9,5 +9,7 @@ public interface ITypeOfFurnitureService
 	Task<TypeOfFurnitureForResultDto> RetrieveByIdAsync(long id);
 	Task<TypeOfFurnitureForResultDto> CreateAsync(TypeOfFurnitureForCreationDto dto);
 	Task<TypeOfFurnitureForResultDto> ModifyAsync(long id, TypeOfFurnitureForUpdateDto dto);
-	Task<IEnumerable<TypeOfFurnitureForResultDto>> RetrieveAllAsync();
+	Task<IEnumerable<TypeOfFurnitureForResultDto>> RetrieveAllAsync(PaginationParams @params);
+	Task<IEnumerable<TypeOfFurnitureForResultDto>> RetrieveAllTypeOfFurnituresAsync();
+    Task<byte[]> DownloadAsync(string imageName);
 }

@@ -10,4 +10,5 @@ public interface IFurnitureFeatureService
 	Task<FurnitureFeatureForResultDto> CreateAsync(FurnitureFeatureForCreationDto dto);
 	Task<FurnitureFeatureForResultDto> ModifyAsync(long id, FurnitureFeatureForUpdateDto dto);
 	Task<IEnumerable<FurnitureFeatureForResultDto>> RetrieveAllAsync(PaginationParams @params);
+	Task<IEnumerable<FurnitureFeatureForResultDto>> RetrieveAllFeaturesAsync();
 }

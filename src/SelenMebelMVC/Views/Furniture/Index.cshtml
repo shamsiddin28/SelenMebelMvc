@@ -6,7 +6,7 @@
 <h3 class="text-center mb-5">@ViewData["Title"]</h3>
 
 @if (TempData["InfoMessage"] != null)
-{
+{	
 	<div class='alert alert-info alert-dismissible fade show' role='alert'>
 		<strong>Information ! </strong> @TempData["InfoMessage"]
 		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
@@ -63,7 +63,7 @@ else if (TempData["ErrorMessage"] != null)
 			</tr>
 			<tr>
 				<td>
-					@Html.TextBox("searchValue", null, new {Class = "form-control", placeholder="Enter Furniture or Category Name or UniqueId"})
+					@Html.TextBox("searchValue", null, new {Class = "form-control", placeholder="Enter Furniture or Category Name or UniqueId or Price"})
 				</td>
 				<td>
 					&nbsp;
@@ -76,36 +76,72 @@ else if (TempData["ErrorMessage"] != null)
 	}
 </div>
 
+<nav aria-label="Page navigation">
+	<ul class="pagination justify-content-center">
+		@{
+			var pageIndex = ViewData["PageIndex"] != null ? (int)ViewData["PageIndex"] : 1;
+			var pageSize = ViewData["PageSize"] != null ? (int)ViewData["PageSize"] : 10;
+			var totalItems = ViewData["TotalItems"];
+			var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
+			var searchBy = ViewData["SearchBy"];
+			var searchValue = ViewData["SearchValue"];
+		}
+
+		@if (totalPages > 1)
+		{
+			<li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=1&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">First</a>
+			</li>
+			<li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=@(pageIndex - 1)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Previous</a>
+			</li>
+
+			@for (var i = 1; i <= totalPages; i++)
+			{
+				<li class="page-item @(pageIndex == i ? "active" : "")" aria-current="page">
+					<a class="page-link" href="?pageIndex=@(i)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">@i</a>
+				</li>
+			}
+
+			<li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=@(pageIndex + 1)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Next</a>
+			</li>
+			<li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=@totalPages&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Last</a>
+			</li>
+		}
+	</ul>
+</nav>
 
 <table class="table table-bordered table-responsive table-hover">
 	<thead>
 		<tr class="table-active">
-			<th>
+			<th style="cursor: pointer;" onclick="sortTable('Id')">
 				@Html.DisplayNameFor(model => model.Name)
 			</th>
-			<th>
+			<th style="cursor: pointer;" onclick="sortTable('Category')">
 				@Html.DisplayNameFor(model => model.TypeOfFurniture.Category)
 			</th>
-			<th>
+			<th style="cursor: pointer;" onclick="sortTable('TypeOfSelen')">
 				@Html.DisplayNameFor(model => model.TypeOfFurniture.TypeOfSelen)
 			</th>
 			<th>
 				@Html.DisplayNameFor(model => model.Image)
 			</th>
-			<th>
+			<th style="cursor: pointer;" onclick="sortTable('Description')">
 				@Html.DisplayNameFor(model => model.Description)
 			</th>
-			<th>
+			<th style="cursor: pointer;" onclick="sortTable('UniqueId')">
 				@Html.DisplayNameFor(model => model.UniqueId)
 			</th>
-			<th>	
+			<th style="cursor: pointer;" onclick="sortTable('Price')">
 				@Html.DisplayNameFor(model => model.Price)
 			</th>
-			<th>
+			<th style="cursor: pointer;" onclick="sortTable('CreatedAt')">
 				@Html.DisplayNameFor(model => model.CreatedAt)
 			</th>
-			<th>
+			<th style="cursor: pointer;" onclick="sortTable('UpdatedAt')">
 				@Html.DisplayNameFor(model => model.UpdatedAt)
 			</th>
 			<th>
@@ -188,3 +224,6 @@ else if (TempData["ErrorMessage"] != null)
 	</tbody>
 	
 </table>
+
+
+

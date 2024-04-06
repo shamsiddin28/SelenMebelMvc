@@ -1,5 +1,4 @@
 ﻿using SelenMebel.Domain.Configurations;
-using SelenMebel.Service.DTOs.Furnitures;
 using SelenMebel.Service.DTOs.Orders;
 
 namespace SelenMebel.Service.Interfaces.Orders;

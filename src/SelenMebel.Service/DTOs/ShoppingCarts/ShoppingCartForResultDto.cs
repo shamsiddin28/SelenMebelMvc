@@ -1,10 +1,8 @@
-﻿using SelenMebel.Domain.Entities;
-using SelenMebel.Service.DTOs.CartDetails;
-using System.ComponentModel.DataAnnotations;
+﻿using SelenMebel.Service.DTOs.CartDetails;
 
 namespace SelenMebel.Service.DTOs.ShoppingCarts;
 
-public  class ShoppingCartForResultDto
+public class ShoppingCartForResultDto
 {
 	public long Id { get; set; }
 	public string UserId { get; set; }

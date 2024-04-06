@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using SelenMebel.Domain.Enums;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace SelenMebel.Service.DTOs.TypeOfFurnitures;

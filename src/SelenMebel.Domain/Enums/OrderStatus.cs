@@ -9,10 +9,10 @@ public enum OrderStatus
 
 	[Display(Name = "Processing")]
 	Processing = 2,
-	
+
 	[Display(Name = "Shipped")]
 	Shipped = 3,
-	
+
 	[Display(Name = "Cancelled")]
 	Cancelled = 4
 }

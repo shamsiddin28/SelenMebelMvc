@@ -99,7 +99,7 @@
             var selectedValue = this.value;
 
             // Fetch request
-            fetch(`https://localhost:7200/api/Categories/${selectedValue}`)
+            fetch(`https://selenmebelapi20240307024627.azurewebsites.net/api/Categories/${selectedValue}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

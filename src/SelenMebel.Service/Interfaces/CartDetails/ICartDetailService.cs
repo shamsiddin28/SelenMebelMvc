@@ -1,6 +1,5 @@
 ﻿using SelenMebel.Domain.Configurations;
 using SelenMebel.Service.DTOs.CartDetails;
-using SelenMebel.Service.DTOs.Categories;
 
 namespace SelenMebel.Service.Interfaces.CartDetails;
 

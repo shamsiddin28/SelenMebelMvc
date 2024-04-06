@@ -41,7 +41,7 @@ else if (TempData["ErrorMessage"] != null)
             <div class="row mb-3">
                 <label asp-for="FurnitureId" class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-8">
-                    <input asp-for="FurnitureId" class="form-control" required value="@ViewBag.FurnitureId" />
+                    <input asp-for="FurnitureId" class="form-control" required value="@ViewBag.FurnitureId" disabled />
                     <span asp-validation-for="FurnitureId" class="text-danger"></span>
                 </div>
             </div>

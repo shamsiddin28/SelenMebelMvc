@@ -1,8 +1,5 @@
-﻿using SelenMebel.Domain.Entities;
-using SelenMebel.Service.DTOs.Furnitures;
+﻿using SelenMebel.Service.DTOs.Furnitures;
 using SelenMebel.Service.DTOs.ShoppingCarts;
-using SelenMebel.Service.DTOs.TypeOfFurnitures;
-using System.ComponentModel.DataAnnotations;
 
 namespace SelenMebel.Service.DTOs.CartDetails;
 

@@ -39,6 +39,13 @@ else if (TempData["ErrorMessage"] != null)
         <form method="post" asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Id</label>
+                <div class="col-sm-8">
+                    <input class="form-control" value="@ViewBag.Id" disabled />
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
                 <label asp-for="CategoryId" class="col-sm-4 col-form-label">Category</label>
                 <div class="col-sm-8">
                     <select id="mySelect" asp-for="CategoryId" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container" required>
@@ -104,6 +111,20 @@ else if (TempData["ErrorMessage"] != null)
                 </div>
             </div>
             <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">CreatedAt</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="datetime" value="@ViewBag.CreatedAt" disabled>
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">UpdatedAt</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="datetime" value="@ViewBag.UpdatedAt" disabled>
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
                 <div class="offset-sm-4 col-sm-4 d-grid">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
@@ -127,8 +148,8 @@ else if (TempData["ErrorMessage"] != null)
             var selectedValue = this.value;
 
             // Fetch request
-            fetch(`https://localhost:7200/api/Categories/${selectedValue}`)
-                .then(response => {
+            fetch(`https://selenmebelapi20240307024627.azurewebsites.net/api/Categories/${selectedValue}`)
+                .then(response => {S
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }

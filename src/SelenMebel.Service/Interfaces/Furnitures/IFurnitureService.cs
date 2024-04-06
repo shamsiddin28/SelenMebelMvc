@@ -8,9 +8,11 @@ public interface IFurnitureService
 	string GenerateOtpDigits();
 	Task<bool> RemoveAsync(long id);
 	Task<FurnitureForResultDto> RetrieveByIdAsync(long id);
-	Task<FurnitureForResultDto> RetrieveByUniqueIdAsync(long uniqueId);
+	Task<FurnitureForResultDto> RetrieveByUniqueIdAsync(string uniqueId);
 	Task<FurnitureForResultDto> CreateAsync(FurnitureForCreationDto dto);
 	Task<FurnitureForResultDto> ModifyAsync(long id, FurnitureForUpdateDto dto);
-	Task<IEnumerable<FurnitureForResultDto>> RetrieveAllAsync();
+	Task<IEnumerable<FurnitureForResultDto>> RetrieveAllAsync(PaginationParams @params);
+	Task<IEnumerable<FurnitureForResultDto>> RetrieveAllFurnituresAsync();
+    Task<byte[]> DownloadAsync(string imageName);
 }
 

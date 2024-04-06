@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using SelenMebel.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using SelenMebel.Data.IRepositories;
+using SelenMebel.Data.Interfaces.IRepositories;
+using SelenMebel.Domain.Configurations;
+using SelenMebel.Domain.Entities.Furnitures;
+using SelenMebel.Service.DTOs.FurnitureFeatures;
 using SelenMebel.Service.Exceptions;
 using SelenMebel.Service.Extensions;
-using SelenMebel.Domain.Configurations;
-using SelenMebel.Service.DTOs.FurnitureFeatures;
 using SelenMebel.Service.Interfaces.FurnitureFeatures;
 
 namespace SelenMebel.Service.Services.FurnitureFeatures;
@@ -105,14 +105,26 @@ public class FurnitureFeatureService : IFurnitureFeatureService
 		return _mapper.Map<IEnumerable<FurnitureFeatureForResultDto>>(furnitureFeatures);
 	}
 
+	public async Task<IEnumerable<FurnitureFeatureForResultDto>> RetrieveAllFeaturesAsync()
+	{
+		var furnitureFeatures = await _furnitureFeatureRepository.SelectAll()
+				  .Include(f => f.Furniture)
+				  .ThenInclude(typ => typ.TypeOfFurniture)
+				  .ThenInclude(c => c.Category)
+				  .AsNoTracking()
+				  .ToListAsync();
+
+		return _mapper.Map<IEnumerable<FurnitureFeatureForResultDto>>(furnitureFeatures);
+	}
+
 	public async Task<FurnitureFeatureForResultDto> RetrieveByIdAsync(long id)
 	{
 		var furnitureFeature = await _furnitureFeatureRepository.SelectAll()
 				.Where(u => u.Id == id)
 				.Include(f => f.Furniture)
-                .ThenInclude(typ => typ.TypeOfFurniture)
-                .ThenInclude(c => c.Category)
-                .AsNoTracking()
+				.ThenInclude(typ => typ.TypeOfFurniture)
+				.ThenInclude(c => c.Category)
+				.AsNoTracking()
 				.FirstOrDefaultAsync() ??
 					throw new SelenMebelException(404, "FurnitureFeature is not found !");
 

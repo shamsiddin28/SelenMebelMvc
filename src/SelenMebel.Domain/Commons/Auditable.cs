@@ -1,9 +1,8 @@
 ﻿namespace SelenMebel.Domain.Commons;
 
-public abstract class Auditable
+public class Auditable : BaseEntity
 {
-	public long Id { get; set; }
 	public DateTime CreatedAt { get; set; }
-	public DateTime UpdatedAt { get; set; }
+	public DateTime? UpdatedAt { get; set; }
 	public bool IsDeleted { get; set; } = false;
 }

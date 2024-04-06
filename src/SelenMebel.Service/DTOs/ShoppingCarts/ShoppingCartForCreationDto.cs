@@ -1,5 +1,4 @@
-﻿using SelenMebel.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SelenMebel.Service.DTOs.ShoppingCarts;
 
