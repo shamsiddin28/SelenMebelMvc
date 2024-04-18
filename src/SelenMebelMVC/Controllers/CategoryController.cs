@@ -1,248 +1,125 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SelenMebel.Service.DTOs.Categories;
-using System.Net.Http.Headers;
-using System.Net.Mime;
-using System.Text;
+using SelenMebel.Service.Interfaces.Categories;
 
 namespace SelenMebelMVC.Controllers
 {
+    [Authorize(Roles = "admin, superadmin")]
     public class CategoryController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ICategoryService _categoryService;
 
-        private string baseURL = "https://selenmebelapi20240307024627.azurewebsites.net/api/";
-
-
-        public CategoryController(IHttpClientFactory httpClientFactory)
+        public CategoryController(ICategoryService categoryService)
         {
-            _httpClientFactory = httpClientFactory;
-        }
-
-        public async Task DownloadAndSaveImageAsync(string imageName)
-        {
-
-            using (HttpClient client = new HttpClient())
-            {
-                try
-                {
-                    HttpResponseMessage response = await client.GetAsync(baseURL + $"Categories/DownloadByImageName?imageName={imageName}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string newImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "CategoryImages", "Images", imageName);
-                        using (Stream contentStream = await response.Content.ReadAsStreamAsync(),
-                             fileStream = new FileStream(newImagePath, FileMode.Create, FileAccess.Write, FileShare.None))
-                        {
-                            await contentStream.CopyToAsync(fileStream);
-                        }
-                    }
-                    else
-                    {
-                        TempData["InfoMessage"] = $"Failed to download image. Status code: {response.StatusCode}";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
-                }
-            }
+            _categoryService = categoryService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index(string searchBy, string searchValue, int pageIndex = 1, int pageSize = 3)
         {
-            var categories = new List<CategoryForResultDto>();
-            var categoriesImages = new List<string>();
 
-            using (var client = new HttpClient())
+            var categories = await _categoryService.RetrieveAllCategoriesAsync();
+            int totalItems = categories.Count();
+            var totalPages = 0;
+
+            if (categories.Any())
             {
-                client.BaseAddress = new Uri(baseURL);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                totalItems = categories.Count();
+                ViewBag.Categories = categories;
+                totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
-                HttpResponseMessage getData = await client.GetAsync($"Categories/ByPagination?PageSize={pageSize}&PageIndex={pageIndex}");
-                HttpResponseMessage getAllCategories = await client.GetAsync("Categories");
-                getData.EnsureSuccessStatusCode();
+                ViewData["TotalItems"] = totalItems;
+                ViewData["PageIndex"] = pageIndex;
+                ViewData["PageSize"] = pageSize;
+                ViewData["TotalPages"] = totalPages;
 
-                if (getData.IsSuccessStatusCode && getAllCategories.IsSuccessStatusCode)
+                ViewData["SearchBy"] = searchBy;
+                ViewData["SearchValue"] = searchValue;
+
+                for (int i = 1; i <= totalPages; i++)
                 {
-                    double totalItems = 0;
-                    if (getData.Headers.TryGetValues("X-Total-Count", out var totalCountValues))
+                    var result = categories.Skip((i - 1) * pageSize).Take(pageSize);
+                    if (searchBy.ToLower() == "categoryname")
                     {
-                        string totalCountString = totalCountValues?.FirstOrDefault();
-                        totalItems = int.Parse(totalCountString);
-                    }
-
-                    string results = getData.Content.ReadAsStringAsync().Result;
-                    categories = JsonConvert.DeserializeObject<List<CategoryForResultDto>>(results).OrderByDescending(f => f.Id).ToList();
-                    foreach (var item in categories)
-                    {
-                        await DownloadAndSaveImageAsync(item.Image);
-                    }
-                    ViewBag.Categories = categories;
-
-                    var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
-
-                    ViewData["TotalItems"] = totalItems;
-                    ViewData["PageIndex"] = pageIndex;
-                    ViewData["PageSize"] = pageSize;
-                    ViewData["TotalPages"] = totalPages;
-
-                    if (categories.Count() == 0)
-                    {
-                        TempData["InfoMessage"] = "Currently Furnitures not available in the Database";
-                    }
-                    else
-                    {
-                        if (string.IsNullOrEmpty(searchValue))
+                        var searchByCategoryName = result.Where(c => c.Name.ToLower().Contains(searchValue.ToLower()));
+                        if (searchByCategoryName.Any())
                         {
-                            TempData["InfoMessage"] = "Please provide the search value.";
-                            return View(categories);
+                            ViewData["PageIndex"] = i;
+                            ViewData["PageSize"] = pageSize;
+
+                            return View(searchByCategoryName);
                         }
                         else
                         {
-                            if (getAllCategories.IsSuccessStatusCode)
-                            {
-                                string resultCategories = getAllCategories.Content.ReadAsStringAsync().Result;
-                                var allCategories = JsonConvert.DeserializeObject<List<CategoryForResultDto>>(resultCategories);
-                                ViewData["SearchBy"] = searchBy;
-                                ViewData["SearchValue"] = searchValue;
-
-                                for (int i = 1; i <= totalPages; i++)
-                                {
-                                    var result = allCategories.Skip((i - 1) * pageSize).Take(pageSize);
-                                    if (searchBy.ToLower() == "categoryname")
-                                    {
-                                        var searchByCategoryName = result.Where(c => c.Name.ToLower().Contains(searchValue.ToLower()));
-                                        if (searchByCategoryName.Any())
-                                        {
-                                            ViewData["PageIndex"] = i;
-                                            ViewData["PageSize"] = pageSize;
-
-                                            return View(searchByCategoryName);
-                                        }
-                                        else
-                                        {
-                                            continue;
-                                        }
-                                    }
-                                }
-                                if (categories != null)
-                                {
-                                    // Set pagination data in ViewData
-                                    ViewData["PageIndex"] = pageIndex;
-                                    ViewData["TotalItems"] = totalItems;
-                                    ViewData["PageSize"] = pageSize;
-                                    ViewData["TotalPages"] = totalPages;
-
-                                    return View(categories);
-                                }
-                            }
-                            else
-                            {
-                                TempData["ErrorMessage"] = getAllCategories.ReasonPhrase.ToString();
-                                return View(categories);
-
-                            }
+                            continue;
                         }
                     }
-
-
-                    // Set pagination data in ViewData
-                    ViewData["PageIndex"] = pageIndex;
-                    ViewData["TotalItems"] = totalItems;
-                    ViewData["PageSize"] = pageSize;
-                    ViewData["TotalPages"] = totalPages;
-
-
-                    return View(categories);
+                    else
+                    {
+                        TempData["InfoMessage"] = "Please provide the search value.";
+                        return View(categories);
+                    }
                 }
-                else
-                {
-                    TempData["ErrorMessage"] = getData.ReasonPhrase;
-                    return View(null);
-                }
-
+                return View(await _categoryService.RetrieveByPropertiesOfCategoriesAsync(searchValue));
             }
-
+            else
+            {
+                TempData["InfoMessage"] = "Currently Furnitures not available in the Database";
+                return View(categories);
+            }
         }
 
         [HttpGet]
         public async Task<ViewResult> Edit(long id)
         {
-
-            using (var client = new HttpClient())
+            var category = await _categoryService.RetrieveByIdAsync(id);
+            if (category is not null)
             {
-                CategoryForResultDto model = new CategoryForResultDto();
-                client.BaseAddress = new Uri(baseURL);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                HttpResponseMessage getData = await client.GetAsync($"Categories/{id}");
-
-                if (getData.IsSuccessStatusCode)
+                var categoryUpdate = new CategoryForUpdateDto()
                 {
-                    string results = getData.Content.ReadAsStringAsync().Result;
-                    model = JsonConvert.DeserializeObject<CategoryForResultDto>(results);
+                    Name = category.Name,
+                    ImagePath = category.Image,
+                };
 
-                    return View("Edit", model);
-                }
-                else
-                {
-                    return View("Index");
-                }
+                ViewBag.Id = category.Id;
+                ViewBag.Image = category.Image;
+                ViewBag.CreatedAt = category.CreatedAt;
+                ViewBag.UpdatedAt = category.UpdatedAt;
+                ViewBag.TypeOfFurnitures = category.TypeOfFurnitures;
 
+                return View("Edit", categoryUpdate);
+            }
+            else
+            {
+                return View("Edit", id);
             }
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(long id, CategoryForUpdateDto model)
         {
-            if (id < 0)
+            if (model.Image == null)
             {
-                return RedirectToAction("Index");
-            }
-            else if (model.Image == null)
-            {
-                ModelState.AddModelError("FurnitureCreationDto.Image", "The image file is required");
+                ModelState.AddModelError("CategoryForUpdateDto.Image", "The image file is required");
             }
             else if (model.Name == null)
             {
-                ModelState.AddModelError("FurnitureCreationDto.Name", "The name is required");
+                ModelState.AddModelError("CategoryForUpdateDto.Name", "The name is required");
             }
 
-            if (ModelState.IsValid && model.Image != null && model.Name != null)
+            if (ModelState.IsValid)
             {
-                var apiClient = _httpClientFactory.CreateClient("client");
-                var apiUrl = apiClient.BaseAddress + $"api/Categories/{id}";
-
-                using (var multipartContent = new MultipartFormDataContent())
+                var product = await _categoryService.ModifyAsync(id, model);
+                if (product is not null)
                 {
-
-                    multipartContent.Add(new StringContent(model.Name, Encoding.UTF8, MediaTypeNames.Text.Plain), "name");
-                    var imageContent = new StreamContent(model.Image.OpenReadStream());
-                    imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Image.Jpeg);
-                    multipartContent.Add(imageContent, "Image", model.Image.FileName);
-
-                    var response = await apiClient.PutAsync(apiUrl, multipartContent);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseContent = await response.Content.ReadAsStringAsync();
-                        TempData["SuccessMessage"] = "Category Updated Successfully !";
-
-                        model.Name = "";
-                        model.Image = null;
-
-                        ModelState.Clear();
-                        return RedirectToAction("Index");
-                    }
-                    else
-                    {
-                        TempData["ErrorMessage"] = response.ReasonPhrase;
-                        return View("Edit", model);
-                    }
-
+                    TempData["SuccessMessage"] = "Category Updated Successfully !";
+                    return RedirectToAction("Index", "Products");
+                }
+                else
+                {
+                    TempData["InfoMessage"] = $"This Category {id} not found !";
+                    return await Edit(id);
                 }
             }
             else
@@ -265,112 +142,66 @@ namespace SelenMebelMVC.Controllers
         {
             try
             {
-                if (model.Name != null)
+
+                if (model.Image == null)
                 {
-                    if (model.Image == null)
+                    ModelState.AddModelError("CategoryForCreationDto.Image", "The image file is required");
+                }
+                else if (model.Name == null)
+                {
+                    ModelState.AddModelError("CategoryForCreationDto.Name", "The name is required");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    var category = await _categoryService.CreateAsync(model);
+                    if (category is not null)
                     {
-                        ModelState.AddModelError("FurnitureCreationDto.Image", "The image file is required");
-                    }
-
-                    if (ModelState.IsValid)
-                    {
-                        var apiClient = _httpClientFactory.CreateClient("client");
-                        var apiUrl = apiClient.BaseAddress + "api/Categories";
-
-                        using (var multipartContent = new MultipartFormDataContent())
-                        {
-
-                            multipartContent.Add(new StringContent(model.Name, Encoding.UTF8, MediaTypeNames.Text.Plain), "name");
-                            var imageContent = new StreamContent(model.Image.OpenReadStream());
-                            imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Image.Jpeg);
-                            multipartContent.Add(imageContent, "Image", model.Image.FileName);
-
-                            var response = await apiClient.PostAsync(apiUrl, multipartContent);
-                            if (response.IsSuccessStatusCode)
-                            {
-                                var responseContent = await response.Content.ReadAsStringAsync();
-                                TempData["SuccessMessage"] = "Category Created Successfully !";
-
-                                model.Name = "";
-                                model.Image = null;
-
-                                ModelState.Clear();
-                                return RedirectToAction("Index");
-                            }
-                            else
-                            {
-                                TempData["ErrorMessage"] = response.ReasonPhrase;
-                            }
-
-                        }
+                        ModelState.Clear();
+                        return RedirectToAction("Index", "Category", new { area = "" });
                     }
                     else
                     {
-                        TempData["InfoMessage"] = "Please provide all the required fields";
-
+                        return Create();
                     }
+                }
+                else
+                {
+                    TempData["InfoMessage"] = "Please provide all the required fields";
+                    return Create();
                 }
 
             }
             catch (Exception ex)
             {
-
-                TempData["ErrorMessage"] = ex.Message;
-                return View();
+                TempData["InfoMessage"] = $"{ex.Message}";
+                throw;
             }
-            return View();
         }
 
         [HttpGet]
         public async Task<ViewResult> Delete(long id)
         {
-            using (var client = new HttpClient())
-            {
-                CategoryForResultDto model = new CategoryForResultDto();
-                client.BaseAddress = new Uri(baseURL);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                HttpResponseMessage getData = await client.GetAsync($"Categories/{id}");
-
-                if (getData.IsSuccessStatusCode)
-                {
-                    string results = getData.Content.ReadAsStringAsync().Result;
-                    model = JsonConvert.DeserializeObject<CategoryForResultDto>(results);
-
-                    return View("Delete", model);
-                }
-                else
-                {
-                    return View("Index");
-                }
-
-            }
+            var category = await _categoryService.RetrieveByIdAsync(id);
+            if (category is not null) return View("Delete", category);
+            else return View("Delete", id);
         }
 
         [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirmed(long id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (id <= 0)
-            {
-                return RedirectToAction("Index");
-            }
-
             try
             {
-                var apiClient = _httpClientFactory.CreateClient("client");
-                var apiUrl = apiClient.BaseAddress + $"api/Categories/{id}";
-
-                HttpResponseMessage response = apiClient.DeleteAsync(apiUrl).Result;
-                if (response.IsSuccessStatusCode)
+                var product = await _categoryService.RemoveAsync(id);
+                if (product)
                 {
-                    TempData["SuccessMessage"] = $"{id}th-Id Category is Deleted Successfully !";
-                    return RedirectToAction("Index");
+                    TempData["SuccessMessage"] = "Category Deleted Successfully !";
+                    return RedirectToAction("Index", "Category");
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = response.ReasonPhrase;
-                    return RedirectToAction("Index");
+                    TempData["InfoMessage"] = $"This category {id} not found !";
+                    return View("Delete", id);
                 }
 
             }

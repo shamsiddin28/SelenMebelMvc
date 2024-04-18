@@ -5,7 +5,6 @@ using SelenMebel.Service.DTOs.Accounts;
 using SelenMebel.Service.DTOs.Admins;
 using SelenMebel.Service.DTOs.Users;
 using SelenMebel.Service.Exceptions;
-using SelenMebel.Service.Interfaces.Commons;
 using SelenMebel.Service.Interfaces.Users;
 
 namespace SelenMebel.Api.Controllers.Users
@@ -13,12 +12,10 @@ namespace SelenMebel.Api.Controllers.Users
     public class UsersController : BaseController
     {
         private readonly IUserService _userService;
-        private readonly IIdentityService _identityService;
 
-        public UsersController(IUserService userService, IIdentityService identityService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
-            _identityService = identityService;
         }
 
         [HttpPost("user/register")]
@@ -78,9 +75,9 @@ namespace SelenMebel.Api.Controllers.Users
         public async Task<IActionResult> PutAsync([FromRoute(Name = "id")] long id, [FromForm] UserUpdateDto dto)
             => Ok(await this._userService.UpdateAsync(id, dto));
 
-
+        [Authorize]
         [HttpPatch("user/update-image/{id}")]
-        public async Task<IActionResult> UpdateImageAsync(long id, [FromForm] IFormFile formFile)
+        public async Task<IActionResult> UpdateImageAsync(long id, IFormFile formFile)
             => Ok(await this._userService.UpdateImageAsync(id, formFile));
 
         [Authorize]
@@ -93,6 +90,7 @@ namespace SelenMebel.Api.Controllers.Users
         public async Task<IActionResult> DeleteAsync([FromRoute(Name = "id")] long id)
             => Ok(await this._userService.DeleteAsync(id));
 
+        [Authorize]
         [HttpDelete("user/delete-image/{id}")]
         public async Task<IActionResult> DeleteImageAsync([FromRoute(Name = "id")] long id)
             => Ok(await this._userService.DeleteImageAsync(id));

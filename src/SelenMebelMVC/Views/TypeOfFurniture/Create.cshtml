@@ -102,7 +102,7 @@ else if (TempData["ErrorMessage"] != null)
             var selectedValue = this.value;
 
             // Fetch request
-            fetch(`https://selenmebelapi20240307024627.azurewebsites.net/api/Categories/${selectedValue}`)
+            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

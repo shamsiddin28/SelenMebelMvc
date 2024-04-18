@@ -49,7 +49,7 @@ namespace SelenMebel.Api.Controllers.Accounts
             }
             else return RedirectToAction("Login", "Accounts");
         }
-        
+
         [HttpGet("admin/log-out")]
         public IActionResult LogOut()
         {

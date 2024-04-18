@@ -7,7 +7,7 @@ namespace SelenMebel.Data.Repositories;
 
 public class FurnitureFeatureRepository : GenericRepository<FurnitureFeature>, IFurnitureFeatureRepository
 {
-	public FurnitureFeatureRepository(SelenMebelDbContext selenMebelDbContext) : base(selenMebelDbContext)
-	{
-	}
+    public FurnitureFeatureRepository(SelenMebelDbContext selenMebelDbContext) : base(selenMebelDbContext)
+    {
+    }
 }

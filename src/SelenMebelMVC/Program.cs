@@ -1,45 +1,47 @@
-using Microsoft.EntityFrameworkCore;
-using SelenMebel.Data.DbContexts;
-using SelenMebel.Data.Interfaces.IRepositories;
-using SelenMebel.Data.Repositories;
-using SelenMebel.Service.Helpers;
+using SelenMebelMVC.Configuration.LayerConfigurations;
+using SelenMebelMVC.Middllewares;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddHttpClient("client", options =>
-{
-	options.BaseAddress = new Uri("https://selenmebelapi20240307024627.azurewebsites.net/");
-});
 
-builder.Services.AddDbContext<SelenMebelDbContext>(options =>
-{
-	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.ConfigureDataAccess(builder.Configuration);
+builder.Services.AddWeb(builder.Configuration);
+builder.Services.AddService();
 
 var app = builder.Build();
-WebHostEnviromentHelper.WebRootPath = Path.GetFullPath("wwwroot");
+//WebHostEnviromentHelper.WebRootPath = Path.GetFullPath("wwwroot");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-	app.UseExceptionHandler("/Home/Error");
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-	app.UseHsts();
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseMiddleware<TokenRedirectMiddleware>();
+
+app.UseStatusCodePages(async context =>
+{
+    if (context.HttpContext.Response.StatusCode == (int)HttpStatusCode.Unauthorized)
+    {
+        context.HttpContext.Response.Redirect("login");
+    }
+});
+
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllerRoute(
-	name: "default",
-	pattern: "{controller=Home}/{action=Index}/{id?}");
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

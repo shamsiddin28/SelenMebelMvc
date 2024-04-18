@@ -24,7 +24,7 @@
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">Id</label>
                 <div class="col-sm-8">
-                    <input class="form-control" value="@ViewBag.Id" disabled />
+                    <input class="form-control" value="@ViewBag.Id" readonly />
                     <span class="text-danger"></span>
                 </div>
             </div>
@@ -79,17 +79,17 @@
             <div class="row mb-3">
                 <label asp-for="Name" class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-8">
-                    <input asp-for="Name" class="form-control" value="@ViewBag.Name" />
+                    <input asp-for="Name" class="form-control" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
             </div>
-            <div class="row mb-3">
+            @* <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">Old Description</label>
                 <div class="col-sm-8">
                     <textarea class="form-control" disabled>@ViewBag.Description</textarea>
                     <span class="text-danger"></span>
                 </div>
-            </div>
+            </div> *@
             <div class="row mb-3">
                 <label asp-for="Description" class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-8">
@@ -98,23 +98,23 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <label class="col-sm-4 col-form-label">UniqueId</label>
+                <label asp-for="UniqueId" class="col-sm-4 col-form-label">UniqueId</label>
                 <div class="col-sm-8">
-                    <input class="form-control" value="@ViewBag.UniqueId" disabled />
-                    <span class="text-danger"></span>
+                    <input class="form-control" asp-for="UniqueId" readonly />
+                    <span class="text-danger" asp-validation-for="UniqueId"></span>
                 </div>
             </div>
             <div class="row mb-3">
                 <label asp-for="Price" class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-8">
-                    <input asp-for="Price" class="form-control" value="@ViewBag.Price" required />
+                    <input asp-for="Price" class="form-control" required />
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
             </div>
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">Old Image</label>
                 <div class="col-sm-8">
-                    <img src="~/FurnitureImages/Images/@ViewBag.Image" alt="" width=200 />
+                    <img src="~/@Model.ImagePath" alt="" width=200 />
                 </div>
             </div>
             <div class="row mb-3">
@@ -164,7 +164,7 @@
             var selectedValue = this.value;
 
             // Fetch request
-            fetch(`https://localhost:7200/api/Categories/${selectedValue}`)
+            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

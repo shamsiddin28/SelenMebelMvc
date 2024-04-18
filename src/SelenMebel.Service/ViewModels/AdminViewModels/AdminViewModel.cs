@@ -22,7 +22,7 @@ namespace SelenMebel.Service.ViewModels.AdminViewModels
         public Role Role { get; set; }
 
         public DateTime CreatedAt { get; set; } = default!;
-        
+
         public DateTime? UpdatedAt { get; set; }
 
         public static implicit operator AdminViewModel(Admin model)

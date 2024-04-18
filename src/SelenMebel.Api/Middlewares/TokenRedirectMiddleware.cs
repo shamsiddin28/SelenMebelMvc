@@ -5,7 +5,7 @@
         private readonly RequestDelegate _next;
         public TokenRedirectMiddleware(RequestDelegate next)
         {
-            this._next = next;
+            _next = next;
         }
 
         public Task InvokeAsync(HttpContext httpContext)
@@ -15,7 +15,7 @@
                 if (!string.IsNullOrEmpty(accessToken))
                 {
                     string bearerToken = string.Format("Bearer {0}", accessToken);
-                    httpContext.Request.Headers.Add("Authorization", bearerToken);
+                    httpContext.Request.Headers.Append("Authorization", bearerToken);
                 }
             }
             return _next(httpContext);

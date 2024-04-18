@@ -9,7 +9,6 @@ using SelenMebel.Service.DTOs.Admins;
 using SelenMebel.Service.Exceptions;
 using SelenMebel.Service.Interfaces.Accounts;
 using SelenMebel.Service.Interfaces.Commons;
-using SelenMebel.Service.ViewModels.AdminViewModels;
 
 namespace SelenMebel.Service.Services.Accounts;
 
@@ -42,7 +41,7 @@ public class AccountService : IAccountService
         admin.CreatedAt = TimeHelper.GetCurrentServerTime();
 
         var result = await _repository.Admins.InsertAsync(admin);
-        if(result is not null)
+        if (result is not null)
             return true;
         return false;
     }
@@ -67,7 +66,7 @@ public class AccountService : IAccountService
             }
 
         }
-        else if(admin.AdminRole == Role.SuperAdmin)
+        else if (admin.AdminRole == Role.SuperAdmin)
         {
             var hasherResult = PasswordHasher.Verify(accountLoginDto.Password, admin.Salt, admin.PasswordHash);
             if (hasherResult)
@@ -83,7 +82,7 @@ public class AccountService : IAccountService
             }
             else throw new NotFoundException(nameof(accountLoginDto.Password), "Incorrect password!");
         }
-        else 
+        else
         {
             var hasherResult = PasswordHasher.Verify(accountLoginDto.Password, admin.Salt, admin.PasswordHash);
             if (hasherResult)

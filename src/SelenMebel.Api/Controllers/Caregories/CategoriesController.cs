@@ -6,7 +6,6 @@ using SelenMebel.Service.Interfaces.Categories;
 
 namespace SelenMebel.Api.Controllers.Caregories
 {
-    [Authorize(Roles = "admin")]
     public class CategoriesController : BaseController
     {
         private readonly ICategoryService _categoryService;
@@ -16,9 +15,10 @@ namespace SelenMebel.Api.Controllers.Caregories
             _categoryService = categoryService;
         }
 
+        [Authorize(Roles = "admin, superadmin")]
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromForm] CategoryForCreationDto dto)
-        => Ok(await _categoryService.CreateAsync(dto));
+            => Ok(await _categoryService.CreateAsync(dto));
 
         [HttpGet("ByPagination")]
         public async Task<IActionResult> GetAllAsync([FromQuery] PaginationParams @params)
@@ -32,19 +32,14 @@ namespace SelenMebel.Api.Controllers.Caregories
         public async Task<IActionResult> GetByIdAsync([FromRoute(Name = "id")] long id)
             => Ok(await _categoryService.RetrieveByIdAsync(id));
 
-        [Authorize(Roles = "superadmin")]
+        [Authorize(Roles = "admin, superadmin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync([FromRoute(Name = "id")] long id)
             => Ok(await _categoryService.RemoveAsync(id));
 
+        [Authorize(Roles = "admin, superadmin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync([FromRoute(Name = "id")] long id, [FromForm] CategoryForUpdateDto dto)
             => Ok(await _categoryService.ModifyAsync(id, dto));
-
-        [HttpGet("DownloadByImageName")]
-        public async Task<IActionResult> DownloadAsync(string imageName)
-        {
-            return File(await this._categoryService.DownloadAsync(imageName), "application/octet-stream", imageName);
-        }
     }
 }

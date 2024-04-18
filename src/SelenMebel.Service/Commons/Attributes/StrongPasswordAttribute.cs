@@ -5,7 +5,7 @@ namespace SelenMebel.Service.Commons.Attributes;
 
 public class StrongPasswordAttribute : ValidationAttribute
 {
-    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
         if (value is null) return new ValidationResult("Set a password!");
         else

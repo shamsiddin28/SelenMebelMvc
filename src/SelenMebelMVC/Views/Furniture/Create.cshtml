@@ -11,7 +11,7 @@
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <p>Do you want to add new TypeOfFurniture? Click <a href="https://localhost:7005/TypeOfFurniture/Create">here</a></p>
+        <p>Do you want to add new TypeOfFurniture? Click <a asp-action="Create" asp-controller="TypeOfFurniture" >here</a></p>
     </div>
 </div>
 
@@ -99,7 +99,7 @@
             var selectedValue = this.value;
 
             // Fetch request
-            fetch(`https://selenmebelapi20240307024627.azurewebsites.net/api/Categories/${selectedValue}`)
+            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

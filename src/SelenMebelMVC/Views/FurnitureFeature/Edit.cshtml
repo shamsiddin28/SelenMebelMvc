@@ -13,42 +13,42 @@
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">Id</label>
                 <div class="col-sm-8">
-                    <input class="form-control" value="@ViewBag.Id" disabled />
+                    <input class="form-control" value="@ViewBag.Id" readonly />
                     <span class="text-danger"></span>
                 </div>
             </div>
             <div class="row mb-3">
                 <label asp-for="FurnitureId" class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-8">
-                    <input asp-for="FurnitureId" class="form-control" value="@ViewBag.FurnitureId" required />
+                    <input asp-for="FurnitureId" class="form-control" required />
                     <span asp-validation-for="FurnitureId" class="text-danger"></span>
                 </div>
             </div>
             <div class="row mb-3">
                 <label asp-for="Name" class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-8">
-                    <input asp-for="Name" class="form-control" value="@ViewBag.Name" required />
+                    <input asp-for="Name" class="form-control" required />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
             </div>
             <div class="row mb-3">
                 <label asp-for="Value" class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-8">
-                    <input asp-for="Value" class="form-control" value="@ViewBag.Value" required />
+                    <input asp-for="Value" class="form-control" required />
                     <span asp-validation-for="Value" class="text-danger"></span>
                 </div>
             </div>
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">CreatedAt</label>
                 <div class="col-sm-8">
-                    <input class="form-control" type="datetime" value="@ViewBag.CreatedAt" disabled>
+                    <input class="form-control" type="datetime" value="@ViewBag.CreatedAt" readonly>
                     <span class="text-danger"></span>
                 </div>
             </div>
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">UpdatedAt</label>
                 <div class="col-sm-8">
-                    <input class="form-control" type="datetime" value="@ViewBag.UpdatedAt" disabled>
+                    <input class="form-control" type="datetime" value="@ViewBag.UpdatedAt" readonly>
                     <span class="text-danger"></span>
                 </div>
             </div>

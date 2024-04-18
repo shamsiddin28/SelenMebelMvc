@@ -205,7 +205,7 @@ else if (TempData["ErrorMessage"] != null)
 							<a asp-action="Edit" asp-route-id="@furniture.Id" class="btn btn-primary btn-sm">Edit</a>
 							<a asp-action="Delete" asp-route-id="@furniture.Id" class="btn btn-danger btn-sm">Delete</a>
 							<a asp-action="Details" asp-route-id="@furniture.Id" class="btn btn-primary btn-sm">Details</a>
-							<a asp-action="CreateFurnitureFeature" asp-route-id="@furniture.Id" class="btn btn-success btn-sm">AddFeature</a>
+							<a asp-action="Create" asp-controller="FurnitureFeature" asp-route-id="@furniture.Id" class="btn btn-success btn-sm">AddFeature</a>
 						</div>
 					</td>
 				</tr>

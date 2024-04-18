@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using SelenMebel.Data.Interfaces.Commons;
 using SelenMebel.Domain.Entities;
-using SelenMebel.Domain.Enums;
 using SelenMebel.Service.Commons.Helpers;
 using SelenMebel.Service.Commons.Security;
 using SelenMebel.Service.DTOs.Accounts;
@@ -39,14 +38,14 @@ namespace SelenMebel.Service.Services.Users
             this._imageService = imageService;
             this._mapper = mapper;
             this._identityService = identityService;
-            _fileService = fileService;
+            this._fileService = fileService;
         }
 
         public async Task<bool> UpdateImageAsync(long id, IFormFile path)
         {
             var user = await _repository.Users.SelectByIdAsync(id);
             if (user == null)
-                throw new StatusCodeException(System.Net.HttpStatusCode.NotFound, "teacher is not found");
+                throw new StatusCodeException(HttpStatusCode.NotFound, "teacher is not found");
             _repository.Users.TrackingDeteched(user);
             if (user.Image != null)
             {
@@ -70,56 +69,20 @@ namespace SelenMebel.Service.Services.Users
 
         public async Task<string> LoginAsync(AccountLoginDto accountLoginDto)
         {
-            var admin = await _repository.Admins.FirstOrDefault(x => x.PhoneNumber == accountLoginDto.PhoneNumber);
-            if (admin is null)
-            {
-                var user = await _repository.Users.FirstOrDefault(x => x.PhoneNumber == accountLoginDto.PhoneNumber);
-                if (user is null)
-                    throw new NotFoundException(nameof(accountLoginDto.PhoneNumber), "No user with this phone number is found!");
-                else
-                {
-                    var hasherResult = PasswordHasher.Verify(accountLoginDto.Password, user.Salt, user.PasswordHash);
-                    if (hasherResult)
-                    {
-                        string token = _authService.GenerateToken(user, "user");
-                        return token;
-                    }
-                    else throw new NotFoundException(nameof(accountLoginDto.Password), "Incorrect password!");
-                }
-
-            }
-            else if (admin.AdminRole == Role.SuperAdmin)
-            {
-                var hasherResult = PasswordHasher.Verify(accountLoginDto.Password, admin.Salt, admin.PasswordHash);
-                if (hasherResult)
-                {
-                    string token = "";
-                    if (admin.PhoneNumber != null)
-                    {
-                        token = _authService.GenerateToken(admin, "superadmin");
-                        return token;
-                    }
-                    token = _authService.GenerateToken(admin, "superadmin");
-                    return token;
-                }
-                else throw new NotFoundException(nameof(accountLoginDto.Password), "Incorrect password!");
-            }
+            var user = await _repository.Users.FirstOrDefault(x => x.PhoneNumber == accountLoginDto.PhoneNumber);
+            if (user is null)
+                throw new NotFoundException(nameof(accountLoginDto.PhoneNumber), "No user with this phone number is found!");
             else
             {
-                var hasherResult = PasswordHasher.Verify(accountLoginDto.Password, admin.Salt, admin.PasswordHash);
+                var hasherResult = PasswordHasher.Verify(accountLoginDto.Password, user.Salt, user.PasswordHash);
                 if (hasherResult)
                 {
-                    string token = "";
-                    if (admin.PhoneNumber != null)
-                    {
-                        token = _authService.GenerateToken(admin, "admin");
-                        return token;
-                    }
-                    token = _authService.GenerateToken(admin, "admin");
+                    string token = _authService.GenerateToken(user, "user");
                     return token;
                 }
                 else throw new NotFoundException(nameof(accountLoginDto.Password), "Incorrect password!");
             }
+
         }
 
         public async Task<UserViewModel> GetByIdAsync(long id)
@@ -166,9 +129,11 @@ namespace SelenMebel.Service.Services.Users
         {
             var user = await _repository.Users.SelectByIdAsync(id);
             if (user is null) throw new NotFoundException("User", $"{id} not found");
-            await _repository.Admins.DeleteAsync(id);
+            var isDeletedUser = await _repository.Users.DeleteAsync(id);
+            var isDeletedOldImage = await DeleteImageAsync(id);
+
             int result = await _repository.SaveChangesAsync();
-            return result > 0;
+            return result > 0 && isDeletedUser && isDeletedOldImage;
         }
 
         public async Task<bool> UpdateAsync(long id, UserUpdateDto userUpdateDto)
@@ -184,6 +149,8 @@ namespace SelenMebel.Service.Services.Users
                 user.PhoneNumber = string.IsNullOrEmpty(userUpdateDto.PhoneNumber) ? user.PhoneNumber : userUpdateDto.PhoneNumber;
                 user.Email = string.IsNullOrEmpty(userUpdateDto.Email) ? user.Email : userUpdateDto.Email;
                 user.BirthDate = user.BirthDate;
+
+                var isDeleteOldImage = await _fileService.DeleteImageAsync(user.Image);
                 if (userUpdateDto.Image is not null)
                 {
                     user.Image = await _fileService.UploadImageAsync(userUpdateDto.Image);
@@ -191,7 +158,7 @@ namespace SelenMebel.Service.Services.Users
                 user.UpdatedAt = TimeHelper.GetCurrentServerTime();
                 await _repository.Users.UpdateAsync(user);
                 var result = await _repository.SaveChangesAsync();
-                return result > 0;
+                return result > 0 && isDeleteOldImage;
             }
             else throw new ModelErrorException("", "Not found");
         }
@@ -214,7 +181,7 @@ namespace SelenMebel.Service.Services.Users
             if (result is not null)
                 return true;
             return false;
-        
+
         }
     }
 }

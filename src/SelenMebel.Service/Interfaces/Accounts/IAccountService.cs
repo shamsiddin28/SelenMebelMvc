@@ -1,6 +1,5 @@
 ﻿using SelenMebel.Service.DTOs.Accounts;
 using SelenMebel.Service.DTOs.Admins;
-using SelenMebel.Service.DTOs.Users;
 
 namespace SelenMebel.Service.Interfaces.Accounts
 {

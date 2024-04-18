@@ -5,9 +5,9 @@ namespace SelenMebel.Service.DTOs.Categories;
 
 public class CategoryForCreationDto
 {
-	[Required, MaxLength(40)]
-	public string Name { get; set; }
+    [Required, MaxLength(40)]
+    public string Name { get; set; }
 
-	[Required]
-	public IFormFile Image { get; set; }
+    [Required]
+    public IFormFile Image { get; set; }
 }

@@ -5,11 +5,11 @@ namespace SelenMebel.Service.ViewModels.UserViewModels;
 public class UserViewModel
 {
     public long Id { get; set; }
-    
+
     public string FirstName { get; set; } = string.Empty;
 
     public string LastName { get; set; } = string.Empty;
-    
+
     public string ImagePath { get; set; } = string.Empty;
 
     public string PhoneNumber { get; set; } = string.Empty;

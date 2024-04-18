@@ -1,5 +1,4 @@
-﻿using SelenMebel.Service.Commons.Attributes;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SelenMebel.Service.DTOs.Accounts;
 

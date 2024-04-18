@@ -1,5 +1,5 @@
 ﻿@using SelenMebel.Service.DTOs.Categories;
-@model CategoryForResultDto
+@model CategoryForUpdateDto
 @{
     ViewData["Title"] = "Edit";
 }
@@ -9,10 +9,10 @@
         <h2 class="text-center mb-5">Edit Category</h2>
             <form asp-action="Edit" enctype="multipart/form-data">
                 <div class="row mb-3">
-                    <label asp-for="Id" class="col-sm-4 col-form-label">Id</label>
+                    <label class="col-sm-4 col-form-label">Id</label>
                     <div class="col-sm-8">
-                        <input asp-for="Id" class="form-control" disabled/>
-                        <span asp-validation-for="Id" class="text-danger"></span>
+                    <input class="form-control" value="@ViewBag.Id" readonly />
+                        <span class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -25,7 +25,7 @@
                 <div class="row mb-3">
                     <label class="col-sm-4 col-form-label">Old Image</label>
                     <div class="col-sm-8">
-                        <img src="~/CategoryImages/Images/@Model.Image" alt="" width=200 />
+                        <img src="~/@Model.ImagePath" alt="" width=200 />
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -38,15 +38,15 @@
                 <div class="row mb-3">
                     <label class="col-sm-4 col-form-label">CreatedAt</label>
                     <div class="col-sm-8">
-                        <input class="form-control" type="datetime" asp-for="CreatedAt" disabled>
-                        <span asp-validation-for="CreatedAt" class="text-danger"></span>
+                    <input class="form-control" type="datetime" value="@ViewBag.CreatedAt" readonly>
+                        <span  class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label class="col-sm-4 col-form-label">UpdatedAt</label>
                     <div class="col-sm-8">
-                        <input class="form-control" type="datetime" asp-for="UpdatedAt" disabled>
-                        <span asp-validation-for="UpdatedAt" class="text-danger"></span>
+                    <input class="form-control" type="datetime" value="@ViewBag.CreatedAt" readonly>
+                        <span class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row mb-3">

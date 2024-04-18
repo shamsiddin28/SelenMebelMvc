@@ -1,830 +1,344 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using SelenMebel.Service.DTOs.Categories;
-using SelenMebel.Service.DTOs.FurnitureFeatures;
 using SelenMebel.Service.DTOs.Furnitures;
+using SelenMebel.Service.Interfaces.Categories;
+using SelenMebel.Service.Interfaces.Furnitures;
 using System.Data;
-using System.Net.Http.Headers;
-using System.Net.Mime;
-using System.Text;
 
 namespace SelenMebelMVC.Controllers
 {
-	public class FurnitureController : Controller
-	{
-		public string baseURL = "https://selenmebelapi20240307024627.azurewebsites.net/api/";
+    [Authorize(Roles = "admin, superadmin")]
+    public class FurnitureController : Controller
+    {
+        private readonly IFurnitureService _furnitureService;
+        private readonly ICategoryService _categoryService;
 
-		private readonly IHttpClientFactory _httpClientFactory;
-
-		public FurnitureController(IHttpClientFactory httpClientFactory)
-		{
-			_httpClientFactory = httpClientFactory;
-		}
-
-        public async Task DownloadAndSaveImageAsync(string imageName)
+        public FurnitureController(IFurnitureService furnitureService, ICategoryService categoryService)
         {
+            _furnitureService = furnitureService;
+            _categoryService = categoryService;
+        }
 
-            using (HttpClient client = new HttpClient())
+        [HttpGet]
+        public async Task<IActionResult> GetById([FromRoute(Name = "unique-id")] string uniqueId)
+        {
+            var furniture = await _furnitureService.RetrieveByUniqueIdAsync(uniqueId);
+            if (furniture is not null)
             {
-                try
-                {
-                    HttpResponseMessage response = await client.GetAsync(baseURL + $"Furnitures/DownloadByImageName?imageName={imageName}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string newImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "FurnitureImages", "Images", imageName);
-                        using (Stream contentStream = await response.Content.ReadAsStreamAsync(),
-                             fileStream = new FileStream(newImagePath, FileMode.Create, FileAccess.Write, FileShare.None))
-                        {
-                            await contentStream.CopyToAsync(fileStream);
-                        }
-                    }
-                    else
-                    {
-                        TempData["InfoMessage"] = $"Failed to download image. Status code: {response.StatusCode}";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
-                }
+                return View(nameof(GetById), furniture);
+            }
+            else
+            {
+                return RedirectToAction(nameof(Index));
             }
         }
 
         [HttpGet]
-		public async Task<IActionResult> GetById([FromRoute(Name = "unique-id")] long uniqueId)
-		{
+        public async Task<IActionResult> Index(string searchBy, string searchValue, int pageIndex = 1, int pageSize = 3)
+        {
 
-			using (var client = new HttpClient())
-			{
-				client.BaseAddress = new Uri(baseURL);
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            try
+            {
+                var furnitures = await _furnitureService.RetrieveAllFurnituresAsync();
+                int totalItems = furnitures.Count();
+                var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
-				HttpResponseMessage getData = await client.GetAsync($"Furnitures/{uniqueId}");
+                if (furnitures.Any())
+                {
+                    ViewBag.Furnitures = furnitures;
 
-				if (getData.IsSuccessStatusCode)
-				{
-					string results = getData.Content.ReadAsStringAsync().Result;
-					var furniture = JsonConvert.DeserializeObject<FurnitureForResultDto>(results);
+                    ViewData["TotalItems"] = totalItems;
+                    ViewData["PageIndex"] = pageIndex;
+                    ViewData["PageSize"] = pageSize;
+                    ViewData["TotalPages"] = totalPages;
 
-					return View(furniture);
-				}
-				else
-				{
-					return View(getData.ReasonPhrase);
-				}
-
-			}
-		}
-
-		[HttpGet]
-		public async Task<IActionResult> Index(string searchBy, string searchValue, int pageIndex = 1, int pageSize = 3)
-		{
-			var furnitureList = new List<FurnitureForResultDto>();
-			try
-			{
-
-				using (var client = new HttpClient())
-				{
-					client.BaseAddress = new Uri(baseURL);
-					client.DefaultRequestHeaders.Accept.Clear();
-					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-					HttpResponseMessage getData = await client.GetAsync($"Furnitures/ByPagination?PageSize={pageSize}&PageIndex={pageIndex}");
-					HttpResponseMessage getAllFurnitures = await client.GetAsync($"Furnitures");
-					getData.EnsureSuccessStatusCode();
-
-					if (getData.IsSuccessStatusCode)
-					{
-						double totalItems = 0;
-						if (getData.Headers.TryGetValues("X-Total-Count", out var totalCountValues))
-						{
-							string totalCountString = totalCountValues?.FirstOrDefault();
-							totalItems = int.Parse(totalCountString);
-
-						}
-						string results = getData.Content.ReadAsStringAsync().Result;
-						furnitureList = JsonConvert.DeserializeObject<List<FurnitureForResultDto>>(results).OrderByDescending(f => f.Id).ToList();
-                        foreach (var item in furnitureList)
+                    if (string.IsNullOrEmpty(searchValue))
+                    {
+                        TempData["InfoMessage"] = "Please provide the search value.";
+                        return View(furnitures);
+                    }
+                    else
+                    {
+                        ViewData["SearchBy"] = searchBy;
+                        ViewData["SearchValue"] = searchValue;
+                        for (int i = 1; i <= totalPages; i++)
                         {
-                            await DownloadAndSaveImageAsync(item.Image);
+                            var result = furnitures.Skip((i - 1) * pageSize).Take(pageSize);
+                            if (searchBy.ToLower() == "uniqueid")
+                            {
+                                var searchByUniqueId = result.Where(f => f.UniqueId.ToString().ToLower().Contains(searchValue.ToLower()));
+                                if (searchByUniqueId.Any())
+                                {
+                                    ViewData["PageIndex"] = i;
+                                    ViewData["PageSize"] = pageSize;
+
+                                    return View(searchByUniqueId);
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else if (searchBy.ToLower() == "price")
+                            {
+                                var searchByPrice = result.Where(f => f.Price.ToString().ToLower().Contains(searchValue.ToLower()));
+                                if (searchByPrice.Any())
+                                {
+                                    ViewData["PageIndex"] = i;
+                                    ViewData["PageSize"] = pageSize;
+
+                                    return View(searchByPrice);
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else if (searchBy.ToLower() == "furniturename")
+                            {
+                                var searchByFurnitureName = result.Where(f => f.Name.ToLower().Contains(searchValue.ToLower()));
+                                if (searchByFurnitureName.Any())
+                                {
+                                    ViewData["PageIndex"] = i;
+                                    ViewData["PageSize"] = pageSize;
+
+                                    return View(searchByFurnitureName);
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else if (searchBy.ToLower() == "categoryname")
+                            {
+                                var searchByCategoryName = result.Where(f => f.TypeOfFurniture.Category.Name.ToLower().Contains(searchValue.ToLower()));
+                                if (searchByCategoryName.Any())
+                                {
+                                    ViewData["PageIndex"] = i;
+                                    ViewData["PageSize"] = pageSize;
+
+                                    return View(searchByCategoryName);
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
                         }
-                        var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
-						ViewData["TotalItems"] = totalItems;
-						ViewData["PageIndex"] = pageIndex;
-						ViewData["PageSize"] = pageSize;
-						ViewData["TotalPages"] = totalPages;
-
-						if (furnitureList.Count() == 0)
-						{
-							TempData["InfoMessage"] = "Currently Furnitures not available in the Database";
-						}
-						else
-						{
-							if (string.IsNullOrEmpty(searchValue))
-							{
-								//TempData["InfoMessage"] = "Please provide the search value.";
-
-								return View(furnitureList);
-							}
-							else
-							{
-								if (getAllFurnitures.IsSuccessStatusCode)
-								{
-									string resultFurnitures = getAllFurnitures.Content.ReadAsStringAsync().Result;
-									var allFurnitures = JsonConvert.DeserializeObject<List<FurnitureForResultDto>>(resultFurnitures);
-									ViewData["SearchBy"] = searchBy;
-									ViewData["SearchValue"] = searchValue;
-
-									for (int i = 1; i <= totalPages; i++)
-									{
-										var result = allFurnitures.Skip((i - 1) * pageSize).Take(pageSize);
-										if (searchBy.ToLower() == "uniqueid")
-										{
-											var searchByUniqueId = result.Where(f => f.UniqueId.ToString().ToLower().Contains(searchValue.ToLower()));
-											if (searchByUniqueId.Any())
-											{
-												ViewData["PageIndex"] = i;
-												ViewData["PageSize"] = pageSize;
-
-												return View(searchByUniqueId);
-											}
-											else
-											{
-												continue;
-											}
-										}
-										else if (searchBy.ToLower() == "price")
-										{
-											var searchByPrice = result.Where(f => f.Price.ToString().ToLower().Contains(searchValue.ToLower()));
-											if (searchByPrice.Any())
-											{
-												ViewData["PageIndex"] = i;
-												ViewData["PageSize"] = pageSize;
-
-												return View(searchByPrice);
-											}
-											else
-											{
-												continue;
-											}
-										}
-										else if (searchBy.ToLower() == "furniturename")
-										{
-											var searchByFurnitureName = result.Where(f => f.Name.ToLower().Contains(searchValue.ToLower()));
-											if (searchByFurnitureName.Any())
-											{
-												ViewData["PageIndex"] = i;
-												ViewData["PageSize"] = pageSize;
-
-												return View(searchByFurnitureName);
-											}
-											else
-											{
-												continue;
-											}
-										}
-										else if (searchBy.ToLower() == "categoryname")
-										{
-											var searchByCategoryName = result.Where(f => f.TypeOfFurniture.Category.Name.ToLower().Contains(searchValue.ToLower()));
-											if (searchByCategoryName.Any())
-											{
-												ViewData["PageIndex"] = i;
-												ViewData["PageSize"] = pageSize;
-
-												return View(searchByCategoryName);
-											}
-											else
-											{
-												continue;
-											}
-										}
-									}
-									if (furnitureList != null)
-									{
-										// Set pagination data in ViewData
-										ViewData["PageIndex"] = pageIndex;
-										ViewData["TotalItems"] = totalItems;
-										ViewData["PageSize"] = pageSize;
-										ViewData["TotalPages"] = totalPages;
-
-										return View(furnitureList);
-									}
-								}
-								else
-								{
-									TempData["ErrorMessage"] = getAllFurnitures.ReasonPhrase.ToString();
-									return View(furnitureList);
-
-								}
-							}
-						}
-
-
-						// Set pagination data in ViewData
-						ViewData["PageIndex"] = pageIndex;
-						ViewData["TotalItems"] = totalItems;
-						ViewData["PageSize"] = pageSize;
-						ViewData["TotalPages"] = totalPages;
-
-
-						return View(furnitureList);
-					}
-					else
-					{
-						TempData["ErrorMessage"] = getData.ReasonPhrase.ToString();
-
-						return View(null);
-					}
-
-				}
-			}
-			catch (Exception ex)
-			{
-				TempData["ErrorMessage"] = ex.Message;
-
-				throw;
-			}
-		}
-
-		[HttpGet]
-		public async Task<ViewResult> Create()
-		{
-			var categories = new List<CategoryForResultDto>();
-
-			using (var client = new HttpClient())
-			{
-				client.BaseAddress = new Uri(baseURL);
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-				HttpResponseMessage getData = await client.GetAsync("Categories");
-
-				if (getData.IsSuccessStatusCode)
-				{
-					string results = getData.Content.ReadAsStringAsync().Result;
-					categories = JsonConvert.DeserializeObject<List<CategoryForResultDto>>(results).OrderByDescending(f => f.Id).ToList();
-
-					ViewBag.Categories = categories;
-					FurnitureForCreationDto model = new FurnitureForCreationDto();
-					return View("Create", model);
-				}
-				else
-				{
-					return View(null);
-				}
-
-			}
-		}
-			
-		[HttpPost]
-		public async Task<IActionResult> Create(FurnitureForCreationDto model)
-		{
-			try
-			{
-				if (model.TypeOfFurnitureId == 0 || model.TypeOfFurnitureId < 0)
-				{
-					ModelState.AddModelError("FurnitureCreationDto.TypeOfFurnitureId", "The TypeOfFurniture Id is required");
-				}
-				if (model.Image == null)
-				{
-					ModelState.AddModelError("FurnitureCreationDto.Image", "The image file is required");
-				}
-				if (model.Price < 0.01M)
-				{
-					ModelState.AddModelError("FurnitureCreationDto.Price", "The Price is required");
-				}
-
-				if (ModelState.IsValid)
-				{
-					var apiClient = _httpClientFactory.CreateClient("client");
-					var apiUrl = apiClient.BaseAddress + "api/Furnitures";
-
-					using (var multipartContent = new MultipartFormDataContent())
-					{
-						if (!model.Description.IsNullOrEmpty())
-						{
-							multipartContent.Add(new StringContent(model.Description, Encoding.UTF8, MediaTypeNames.Text.Plain), "description");
-						}
-						if (!model.Name.IsNullOrEmpty())
-						{
-							multipartContent.Add(new StringContent(model.Name, Encoding.UTF8, MediaTypeNames.Text.Plain), "name");
-						}
-						multipartContent.Add(new StringContent(model.Price.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), "price");
-						multipartContent.Add(new StringContent(model.TypeOfFurnitureId.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), "typeOfFurnitureId");
-
-						var imageContent = new StreamContent(model.Image.OpenReadStream());
-						imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Image.Jpeg);
-						multipartContent.Add(imageContent, "Image", model.Image.FileName);
-
-						var response = await apiClient.PostAsync(apiUrl, multipartContent);
-						if (response.IsSuccessStatusCode)
-						{
-							var responseContent = await response.Content.ReadAsStringAsync();
-							FurnitureForResultDto data = JsonConvert.DeserializeObject<FurnitureForResultDto>(responseContent);
-
-							model.Name = "";
-							model.Description = "";
-							model.TypeOfFurnitureId = 1;
-							model.Price = 0;
-							model.Image = null;
-
-							ModelState.Clear();
-							TempData["SuccessMessage"] = "Furniture Created Successfully !";
-							return RedirectToAction("Index");
-						}
-						else
-						{
-							TempData["InfoMessage"] = response.StatusCode;
-						}
-
-					}
-					return View();
-				}
-				else
-				{
-					TempData["InfoMessage"] = "Please provide all the required fields";
-				}
-
-
-			}
-			catch (Exception ex)
-			{
-
-				TempData["ErrorMessage"] = ex.Message;
-				return View();
-			}
-			return View();
-		}
-
-		[HttpGet]
-		public async Task<ViewResult> Edit(long id)
-		{
-
-			using (var client = new HttpClient())
-			{
-				FurnitureForResultDto model = new FurnitureForResultDto();
-				List<CategoryForResultDto> categories = new List<CategoryForResultDto>();
-
-				client.BaseAddress = new Uri(baseURL);
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-				HttpResponseMessage getFurniture = await client.GetAsync($"Furnitures/{id}");
-				HttpResponseMessage getCategories = await client.GetAsync($"Categories");
-
-				if (getFurniture.IsSuccessStatusCode && getCategories.IsSuccessStatusCode)
-				{
-					string results = getFurniture.Content.ReadAsStringAsync().Result;
-					model = JsonConvert.DeserializeObject<FurnitureForResultDto>(results);
-					ViewBag.Id = model.Id;
-					ViewBag.Name = model.Name;
-					ViewBag.Image = model.Image;
-					ViewBag.Price = model.Price;
-					ViewBag.UniqueId = model.UniqueId;
-					ViewBag.Description = model.Description;
-					ViewBag.TypeOfFurniture = model.TypeOfFurniture;
-					ViewBag.Category = model.TypeOfFurniture.Category;
-					ViewBag.Category = model.TypeOfFurniture.Category;
-					ViewBag.CreatedAt = model.CreatedAt;
-					ViewBag.UpdatedAt = model.UpdatedAt;
-
-
-					string resultCategory = getCategories.Content.ReadAsStringAsync().Result;
-					categories = JsonConvert.DeserializeObject<List<CategoryForResultDto>>(resultCategory).OrderByDescending(c => c.Id).ToList();
-					ViewBag.Categories = categories;
-					FurnitureForUpdateDto furnitureForUpdateDto = new FurnitureForUpdateDto();
-					return View("Edit", furnitureForUpdateDto);
-				}
-				else
-				{
-					return View("Index");
-				}
-
-			}
-		}
-
-		[HttpPost]
-		public async Task<IActionResult> Edit(long id, FurnitureForUpdateDto model)
-		{
-
-			if (model.TypeOfFurnitureId == 0 || model.TypeOfFurnitureId < 0)
-			{
-				ModelState.AddModelError("FurnitureForUpdateDto.TypeOfFurnitureId", "The TypeOfFurniture Id is required");
-			}
-			if (model.Image == null)
-			{
-				ModelState.AddModelError("FurnitureForUpdateDto.Image", "The image file is required");
-			}
-			if (model.Price < 0.01M)
-			{
-				ModelState.AddModelError("FurnitureForUpdateDto.Price", "The Price is required");
-			}
-
-			if (ModelState.IsValid)
-			{
-				var apiClient = _httpClientFactory.CreateClient("client");
-				var apiUrl = apiClient.BaseAddress + $"api/Furnitures/{id}";
-
-				using (var multipartContent = new MultipartFormDataContent())
-				{
-					if (!string.IsNullOrEmpty(model.Name))
-					{
-						multipartContent.Add(new StringContent(model.Name, Encoding.UTF8, MediaTypeNames.Text.Plain), "name");
-					}
-					if (!string.IsNullOrEmpty(model.Description))
-					{
-						multipartContent.Add(new StringContent(model.Description, Encoding.UTF8, MediaTypeNames.Text.Plain), "description");
-					}
-
-					multipartContent.Add(new StringContent(model.Price.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), "price");
-					multipartContent.Add(new StringContent(model.TypeOfFurnitureId.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), "typeOfFurnitureId");
-					var imageContent = new StreamContent(model.Image.OpenReadStream());
-					imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Image.Jpeg);
-					multipartContent.Add(imageContent, "Image", model.Image.FileName);
-
-					var response = await apiClient.PutAsync(apiUrl, multipartContent);
-					if (response.IsSuccessStatusCode)
-					{
-						var responseContent = await response.Content.ReadAsStringAsync();
-						TempData["SuccessMessage"] = "Furniture Updated Successfully !";
-
-						model.Name = "";
-						model.Image = null;
-
-						ModelState.Clear();
-						return RedirectToAction("Index");
-					}
-					else
-					{
-						TempData["ErrorMessage"] = response.ReasonPhrase;
-						return View("Edit", model);
-					}
-
-				}
-			}
-			else
-			{
-				TempData["InfoMessage"] = "Please provide all the required fields";
-				return View("Edit", model);
-
-			}
-
-		}
-
-		[HttpGet]
-		public async Task<ViewResult> Delete(long id)
-		{
-			using (var client = new HttpClient())
-			{
-				FurnitureForResultDto model = new FurnitureForResultDto();
-				client.BaseAddress = new Uri(baseURL);
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-				HttpResponseMessage getData = await client.GetAsync($"Furnitures/{id}");
-
-				if (getData.IsSuccessStatusCode)
-				{
-					string results = getData.Content.ReadAsStringAsync().Result;
-					model = JsonConvert.DeserializeObject<FurnitureForResultDto>(results);
-
-					return View("Delete", model);
-				}
-				else
-				{
-					return View("Index");
-				}
-
-			}
-		}
-
-		[HttpPost, ActionName("Delete")]
-		public IActionResult DeleteConfirmed(long id)
-		{
-			if (id <= 0)
-			{
-				return RedirectToAction("Index");
-			}
-
-			try
-			{
-				var apiClient = _httpClientFactory.CreateClient("client");
-				var apiUrl = apiClient.BaseAddress + $"api/Furnitures/{id}";
-
-				HttpResponseMessage response = apiClient.DeleteAsync(apiUrl).Result;
-				if (response.IsSuccessStatusCode)
-				{
-					TempData["SuccessMessage"] = "Furniture is Deleted Successfully !";
-					return RedirectToAction("Index");
-				}
-				else
-				{
-					TempData["ErrorMessage"] = response.ReasonPhrase;
-					return RedirectToAction("Index");
-				}
-
-			}
-			catch (Exception ex)
-			{
-				TempData["ErrorMessage"] = ex.Message;
-				return RedirectToAction("Index");
-			}
-		}
-
-		[HttpGet]
-		public async Task<ViewResult> Details(long id)
-		{
-			using (var client = new HttpClient())
-			{
-				FurnitureForResultDto model = new FurnitureForResultDto();
-				List<CategoryForResultDto> categories = new List<CategoryForResultDto>();
-
-				client.BaseAddress = new Uri(baseURL);
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-				HttpResponseMessage getFurniture = await client.GetAsync($"Furnitures/{id}");
-				HttpResponseMessage getCategories = await client.GetAsync($"Categories");
-
-				if (getFurniture.IsSuccessStatusCode && getCategories.IsSuccessStatusCode)
-				{
-					string results = getFurniture.Content.ReadAsStringAsync().Result;
-					model = JsonConvert.DeserializeObject<FurnitureForResultDto>(results);
-
-					string resultCategory = getCategories.Content.ReadAsStringAsync().Result;
-					categories = JsonConvert.DeserializeObject<List<CategoryForResultDto>>(resultCategory).OrderByDescending(c => c.Id).ToList();
-					ViewBag.Categories = categories;
-
-					return View("Details", model);
-				}
-				else
-				{
-					return View("Index");
-				}
-
-			}
-		}
-
-
-		// CreateFurnitureFeature
-		[HttpGet]
-		public async Task<ViewResult> CreateFurnitureFeature(long id)
-		{
-			var furniture = new FurnitureForResultDto();
-
-			using (var client = new HttpClient())
-			{
-				client.BaseAddress = new Uri(baseURL);
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-				HttpResponseMessage getData = await client.GetAsync($"Furnitures/{id}");
-
-				if (getData.IsSuccessStatusCode)
-				{
-					string results = getData.Content.ReadAsStringAsync().Result;
-					furniture = JsonConvert.DeserializeObject<FurnitureForResultDto>(results);
-
-					ViewBag.FurnitureId = furniture.Id;
-					FurnitureFeatureForCreationDto model = new FurnitureFeatureForCreationDto();
-					return View("CreateFurnitureFeature", model);
-				}
-				else
-				{
-					return View(null);
-				}
-
-			}
-		}
-
-		// CreateFurnitureFeature
-		[HttpPost]
-		public async Task<IActionResult> CreateFurnitureFeature(FurnitureFeatureForCreationDto model)
-		{
-			try
-			{
-
-				if (model.FurnitureId < 0 || model.FurnitureId == 0)
-				{
-					ModelState.AddModelError("FurnitureFeatureForCreationDto.FurnitureId", "The Furniture Id is required");
-				}
-				if (string.IsNullOrEmpty(model.Name))
-				{
-					ModelState.AddModelError("FurnitureFeatureForCreationDto.Name", "The Name is required");
-				}
-				if (string.IsNullOrEmpty(model.Value))
-				{
-					ModelState.AddModelError("FurnitureFeatureForCreationDto.Value", "The Value is required");
-				}
-
-
-				if (ModelState.IsValid)
-				{
-					var apiClient = _httpClientFactory.CreateClient("client");
-					var apiUrl = apiClient.BaseAddress + "api/FurnitureFeatures";
-
-					using (var multipartContent = new MultipartFormDataContent())
-					{
-						var id = model.FurnitureId;
-						multipartContent.Add(new StringContent(model.FurnitureId.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), "furnitureId");
-						multipartContent.Add(new StringContent(model.Name.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), "name");
-						multipartContent.Add(new StringContent(model.Value.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), "value");
-
-						var response = await apiClient.PostAsync(apiUrl, multipartContent);
-						if (response.IsSuccessStatusCode)
-						{
-							var responseContent = await response.Content.ReadAsStringAsync();
-							FurnitureForResultDto data = JsonConvert.DeserializeObject<FurnitureForResultDto>(responseContent);
-
-							ViewBag.FurnitureId = model.FurnitureId;
-
-							ModelState.Clear();
-
-							TempData["SuccessMessage"] = "FurnitureFeature Created Successfully !";
-							return View("CreateFurnitureFeature");
-						}
-						else
-						{
-							TempData["InfoMessage"] = response.StatusCode;
-						}
-
-					}
-					return View("CreateFurnitureFeature");
-
-				}
-				else
-				{
-					TempData["InfoMessage"] = "Please provide all the required fields";
-					return View("CreateFurnitureFeature", model);
-				}
-
-			}
-			catch (Exception ex)
-			{
-				TempData["ErrorMessage"] = ex.Message;
-				return View();
-			}
-		}
-
-		[HttpGet]
-		public async Task<ViewResult> EditFeature(long id)
-		{
-
-			using (var client = new HttpClient())
-			{
-				FurnitureFeatureForResultDto model = new FurnitureFeatureForResultDto();
-
-				client.BaseAddress = new Uri(baseURL);
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-				HttpResponseMessage getFurnitureFeatures = await client.GetAsync($"FurnitureFeatures/{id}");
-
-				if (getFurnitureFeatures.IsSuccessStatusCode)
-				{
-					string results = getFurnitureFeatures.Content.ReadAsStringAsync().Result;
-					model = JsonConvert.DeserializeObject<FurnitureFeatureForResultDto>(results);
-					ViewBag.Name = model.Name;
-					ViewBag.Value = model.Value;
-					ViewBag.FurnitureId = model.Furniture.Id;
-
-					FurnitureFeatureForUpdateDto furnitureFeatureForUpdateDto = new FurnitureFeatureForUpdateDto();
-					return View("EditFeature", furnitureFeatureForUpdateDto);
-				}
-				else
-				{
-					TempData["ErrorMessage"] = getFurnitureFeatures.ReasonPhrase;
-					return View("Index");
-				}
-
-			}
-		}
-
-		[HttpPost]
-		public async Task<IActionResult> EditFeature(long id, FurnitureFeatureForUpdateDto model)
-		{
-
-			if (model.FurnitureId == 0 || model.FurnitureId < 0)
-			{
-				ModelState.AddModelError("FurnitureFeatureForUpdateDto.FurnitureId", "The Furniture Id is required");
-			}
-			if (model.Name == null)
-			{
-				ModelState.AddModelError("FurnitureFeatureForUpdateDto.Name", "The Name is required");
-			}
-			if (model.Value == null)
-			{
-				ModelState.AddModelError("FurnitureFeatureForUpdateDto.Value", "The Value is required");
-			}
-
-			if (ModelState.IsValid)
-			{
-				var apiClient = _httpClientFactory.CreateClient("client");
-				var apiUrl = apiClient.BaseAddress + $"api/FurnitureFeatures/{id}";
-
-				using (var multipartContent = new MultipartFormDataContent())
-				{
-
-					multipartContent.Add(new StringContent(model.FurnitureId.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), "furnitureid");
-					multipartContent.Add(new StringContent(model.Name, Encoding.UTF8, MediaTypeNames.Text.Plain), "name");
-					multipartContent.Add(new StringContent(model.Value, Encoding.UTF8, MediaTypeNames.Text.Plain), "value");
-
-					var response = await apiClient.PutAsync(apiUrl, multipartContent);
-					if (response.IsSuccessStatusCode)
-					{
-						var responseContent = await response.Content.ReadAsStringAsync();
-						TempData["SuccessMessage"] = "FurnitureFeature Updated Successfully !";
-
-						model.Value = "";
-						model.Name = "";
-
-						ModelState.Clear();
-						return RedirectToAction("Details", "Furniture", new { id = model.FurnitureId });
-
-					}
-					else
-					{
-						TempData["ErrorMessage"] = response.ReasonPhrase;
-						return View("EditFeature", model);
-					}
-
-				}
-			}
-			else
-			{
-				TempData["InfoMessage"] = "Please provide all the required fields";
-				return View("EditFeature", model);
-
-			}
-
-		}
-
-		[HttpGet]
-		public async Task<ViewResult> DeleteFeature(long id)
-		{
-			using (var client = new HttpClient())
-			{
-				FurnitureFeatureForResultDto model = new FurnitureFeatureForResultDto();
-				client.BaseAddress = new Uri(baseURL);
-				client.DefaultRequestHeaders.Accept.Clear();
-				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-				HttpResponseMessage getData = await client.GetAsync($"FurnitureFeatures/{id}");
-
-				if (getData.IsSuccessStatusCode)
-				{
-					string results = getData.Content.ReadAsStringAsync().Result;
-					model = JsonConvert.DeserializeObject<FurnitureFeatureForResultDto>(results);
-
-					return View("DeleteFeature", model);
-				}
-				else
-				{
-					return View("Index");
-				}
-
-			}
-		}
-
-		[HttpPost, ActionName("DeleteFeature")]
-		public IActionResult DeleteFeatureConfirmed(long id)
-		{
-			if (id <= 0)
-			{
-				TempData["ErrorMessage"] = "FurnitureFeature not found !";
-				return RedirectToAction("Index");
-			}
-
-			try
-			{
-				var apiClient = _httpClientFactory.CreateClient("client");
-				var apiUrl = apiClient.BaseAddress + $"api/FurnitureFeatures/{id}";
-
-				HttpResponseMessage response = apiClient.DeleteAsync(apiUrl).Result;
-				if (response.IsSuccessStatusCode)
-				{
-
-					TempData["SuccessMessage"] = "FurnitureFeature is Deleted Successfully !";
-					return RedirectToAction("Index");
-				}
-				else
-				{
-					TempData["ErrorMessage"] = response.ReasonPhrase;
-					return RedirectToAction("Index");
-				}
-
-			}
-			catch (Exception ex)
-			{
-				TempData["ErrorMessage"] = ex.Message;
-				return RedirectToAction("Index");
-			}
-		}
-
-	}
+                        return View(await _furnitureService.RetrieveAllByPropertiesOfFurnituresAsync(searchValue));
+                    }
+                }
+                else
+                {
+                    TempData["InfoMessage"] = "Currently Furnitures not available in the Database";
+                    return View(furnitures);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+
+                throw;
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetCategoryById(long id)
+        {
+            var category = await _categoryService.RetrieveByIdAsync(id);
+            if (category.TypeOfFurnitures is not null)
+            {
+                return Ok(category.TypeOfFurnitures);
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpGet]
+        public async Task<ViewResult> Create()
+        {
+            var categories = await _categoryService.RetrieveAllCategoriesAsync();
+            if (categories is not null)
+            {
+                ViewBag.Categories = categories;
+                FurnitureForCreationDto model = new FurnitureForCreationDto();
+                return View("Create", model);
+            }
+            else
+            {
+                TempData["InfoMessage"] = "Currently Categories not available in the Database";
+                return View("Create");
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(FurnitureForCreationDto model)
+        {
+            try
+            {
+                if (model.TypeOfFurnitureId == 0)
+                {
+                    ModelState.AddModelError("FurnitureCreationDto.TypeOfFurnitureId", "The TypeOfFurniture Id is required");
+                }
+                if (model.Image == null)
+                {
+                    ModelState.AddModelError("FurnitureCreationDto.Image", "The image file is required");
+                }
+                if (model.Price < 0.01M)
+                {
+                    ModelState.AddModelError("FurnitureCreationDto.Price", "The Price is required");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    var category = await _furnitureService.CreateAsync(model);
+                    if (category is not null)
+                    {
+                        ModelState.Clear();
+                        return RedirectToAction("Index", "Furniture", new { area = "" });
+                    }
+                    else
+                    {
+                        return View("Create", model);
+                    }
+                }
+                else
+                {
+                    TempData["InfoMessage"] = "Please provide all the required fields";
+                    return View("Create", model);
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<ViewResult> Edit(long id)
+        {
+            var furniture = await _furnitureService.RetrieveByIdAsync(id);
+            if (furniture is not null)
+            {
+                var furnitureUpdate = new FurnitureForUpdateDto()
+                {
+                    Name = furniture.Name,
+                    UniqueId = furniture.UniqueId,
+                    ImagePath = furniture.Image,
+                    Description = furniture.Description,
+                    Price = furniture.Price,
+                    TypeOfFurnitureId = furniture.TypeOfFurniture.Id,
+                };
+
+                ViewBag.Id = furniture.Id;
+                ViewBag.CreatedAt = furniture.CreatedAt;
+                ViewBag.UpdatedAt = furniture.UpdatedAt;
+                ViewBag.TypeOfFurniture = furniture.TypeOfFurniture;
+                ViewBag.Category = furniture.TypeOfFurniture.Category;
+
+                return View("Edit", furnitureUpdate);
+            }
+            else
+            {
+                return View("Edit", id);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(long id, FurnitureForUpdateDto model)
+        {
+
+            if (model.TypeOfFurnitureId == 0)
+            {
+                ModelState.AddModelError("FurnitureForUpdateDto.TypeOfFurnitureId", "The TypeOfFurniture Id is required");
+            }
+            if (model.Image == null)
+            {
+                ModelState.AddModelError("FurnitureForUpdateDto.Image", "The image file is required");
+            }
+            if (model.Price < 0.01M)
+            {
+                ModelState.AddModelError("FurnitureForUpdateDto.Price", "The Price is required");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var furniture = await _furnitureService.ModifyAsync(id, model);
+                if (furniture is not null)
+                {
+                    TempData["SuccessMessage"] = "Furniture Updated Successfully !";
+                    return RedirectToAction("Index", "Furniture");
+                }
+                else
+                {
+                    TempData["InfoMessage"] = $"This Furniture {id} not found !";
+                    return await Edit(id);
+                }
+            }
+            else
+            {
+                TempData["InfoMessage"] = "Please provide all the required fields";
+                return View("Edit", model);
+            }
+
+        }
+
+        [HttpGet]
+        public async Task<ViewResult> Delete(long id)
+        {
+            var furniture = await _furnitureService.RetrieveByIdAsync(id);
+            if (furniture is not null) return View("Delete", furniture);
+            else return View("Delete", id);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(long id)
+        {
+            try
+            {
+                var furniture = await _furnitureService.RemoveAsync(id);
+                if (furniture)
+                {
+                    TempData["SuccessMessage"] = "Furniture Deleted Successfully !";
+                    return RedirectToAction("Index", "Furniture");
+                }
+                else
+                {
+                    TempData["InfoMessage"] = $"This furniture {id} not found !";
+                    return View("Delete", id);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpGet]
+        public async Task<ViewResult> Details(long id)
+        {
+            var furniture = await _furnitureService.RetrieveByIdAsync(id);
+            var categories = await _categoryService.RetrieveAllCategoriesAsync();
+            if (furniture is not null && categories is not null)
+            {
+                ViewBag.Categories = categories;
+
+                return View("Details", furniture);
+            }
+            else
+            {
+                return View("Index");
+            }
+        }
+
+    }
 }

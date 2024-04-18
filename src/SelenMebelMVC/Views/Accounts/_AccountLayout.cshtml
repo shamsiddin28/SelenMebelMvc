@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
+    <link href="~/css/site.css" rel="stylesheet" type="text/css" />
+</head>S
+@* url(https://img.freepik.com/free-photo/mid-century-modern-living-room-interior-design-with-monstera-tree_53876-129804.jpg?size=626&ext=jpg&ga=GA1.1.2040788358.1713469094&semt=sph); *@
+<body style="background-image: src(~/wwwroot/logos/mid-century-modern-living-room-interior-design-with-monstera-tree.jpg) 
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-size: cover;">
+
+    <div>
+        @RenderBody()
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/plugins.site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

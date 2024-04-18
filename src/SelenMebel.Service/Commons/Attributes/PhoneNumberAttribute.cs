@@ -2,11 +2,11 @@
 using System.Text.RegularExpressions;
 
 namespace SelenMebel.Service.Commons.Attributes
-{   
+{
     [AttributeUsage(AttributeTargets.Property)]
     public class PhoneNumberAttribute : ValidationAttribute
     {
-        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             string phoneNumber = (string)value!;
             if (String.IsNullOrWhiteSpace(phoneNumber))

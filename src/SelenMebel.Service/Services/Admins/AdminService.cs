@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using SelenMebel.Data.Interfaces.Commons;
 using SelenMebel.Service.Commons.Helpers;
@@ -9,6 +10,7 @@ using SelenMebel.Service.Interfaces.Admins;
 using SelenMebel.Service.Interfaces.Commons;
 using SelenMebel.Service.Interfaces.Files;
 using SelenMebel.Service.ViewModels.AdminViewModels;
+using System.Net;
 
 namespace SelenMebel.Service.Services.Admins
 {
@@ -17,12 +19,14 @@ namespace SelenMebel.Service.Services.Admins
         private readonly IUnitOfWork _unitOfWork;
         private readonly IIdentityService _identityService;
         private readonly IFileService _fileService;
+        private readonly IMapper _mapper;
 
-        public AdminService(IUnitOfWork unitOfWork, IIdentityService identityService, IFileService fileService)
+        public AdminService(IUnitOfWork unitOfWork, IIdentityService identityService, IFileService fileService, IMapper mapper)
         {
             this._unitOfWork = unitOfWork;
             this._identityService = identityService;
             this._fileService = fileService;
+            this._mapper = mapper;
         }
 
         public async Task<bool> DeleteAsync(long id)
@@ -30,7 +34,7 @@ namespace SelenMebel.Service.Services.Admins
             var admin = await _unitOfWork.Admins.SelectByIdAsync(id);
             if (admin is null) throw new NotFoundException("Admin", $"{id} not found");
             admin.IsDeleted = true;
-            return await _unitOfWork.Admins.DeleteAsync(id);
+            return await _unitOfWork.Admins.DeleteAsync(id) && await _fileService.DeleteImageAsync(admin.Image);
         }
 
         public async Task<bool> DeleteImageAsync(long adminId)
@@ -39,10 +43,10 @@ namespace SelenMebel.Service.Services.Admins
             if (admin is null) throw new NotFoundException("Admin", $"{adminId} not found");
             else
             {
-                await _fileService.DeleteImageAsync(admin.Image!);
+                var isDeletedOldImage = await _fileService.DeleteImageAsync(admin.Image!);
                 admin.Image = "";
                 var result = await _unitOfWork.Admins.UpdateAsync(admin);
-                if (result is not null)
+                if (result is not null && isDeletedOldImage)
                     return true;
                 return false;
             }
@@ -53,7 +57,10 @@ namespace SelenMebel.Service.Services.Admins
             var query = _unitOfWork.Admins.SelectAll();
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(x => x.FirstName.ToLower().StartsWith(search.ToLower()) || x.LastName.ToLower().StartsWith(search.ToLower()) || x.Address.ToLower().StartsWith(search.ToLower()));
+                query = query.Where(x => x.FirstName.ToLower().Contains(search.ToLower())
+                || x.LastName.ToLower().Contains(search.ToLower())
+                || x.Address.ToLower().Contains(search.ToLower())
+                || x.PhoneNumber.ToLower().Contains(search.ToLower()));
             }
 
             var result = await query.OrderByDescending(x => x.CreatedAt).Select(x => (AdminViewModel)x).ToListAsync();
@@ -74,6 +81,14 @@ namespace SelenMebel.Service.Services.Admins
             return adminView;
         }
 
+        public async Task<AdminViewModel> GetByTokenAsync()
+        {
+            var admin = await _unitOfWork.Admins.SelectByIdAsync(long.Parse(_identityService.Id!.Value.ToString()));
+            if (admin is null) throw new StatusCodeException(HttpStatusCode.NotFound, "Admin not found!");
+            var result = _mapper.Map<AdminViewModel>(admin);
+            return result;
+        }
+
         public async Task<AdminViewModel> GetByPhoneNumberAsync(string phoneNumber)
         {
             var admin = await _unitOfWork.Admins.FirstOrDefault(x => x.PhoneNumber == phoneNumber);
@@ -81,7 +96,6 @@ namespace SelenMebel.Service.Services.Admins
             var adminView = (AdminViewModel)admin;
             return adminView;
         }
-
 
         public async Task<bool> UpdateAsync(long id, AdminUpdateDto adminUpdatedDto)
         {
@@ -96,13 +110,16 @@ namespace SelenMebel.Service.Services.Admins
                 admin.PhoneNumber = string.IsNullOrEmpty(adminUpdatedDto.PhoneNumber) ? admin.PhoneNumber : adminUpdatedDto.PhoneNumber;
                 admin.BirthDate = adminUpdatedDto.BirthDate;
                 admin.Address = string.IsNullOrEmpty(adminUpdatedDto.Address) ? admin.Address : adminUpdatedDto.Address;
+
+                var isDeleteOldImage = await _fileService.DeleteImageAsync(admin.Image);
+
                 if (adminUpdatedDto.Image is not null)
                 {
                     admin.Image = await _fileService.UploadImageAsync(adminUpdatedDto.Image);
                 }
                 admin.UpdatedAt = TimeHelper.GetCurrentServerTime();
                 var result = await _unitOfWork.Admins.UpdateAsync(admin);
-                if (result is not null)
+                if (result is not null && isDeleteOldImage)
                     return true;
                 return false;
             }
@@ -112,19 +129,21 @@ namespace SelenMebel.Service.Services.Admins
         public async Task<bool> UpdateImageAsync(long id, IFormFile formFile)
         {
             var admin = await _unitOfWork.Admins.SelectByIdAsync(id);
+            var isDeleteOldImage = await _fileService.DeleteImageAsync(admin.Image);
+
             var updateImage = await _fileService.UploadImageAsync(formFile);
             var adminUpdatedDto = new AdminUpdateDto()
             {
                 ImagePath = updateImage
             };
-            return await UpdateAsync(id, adminUpdatedDto);
+            return await UpdateAsync(id, adminUpdatedDto) && isDeleteOldImage;
         }
 
         public async Task<bool> UpdatePasswordAsync(long id, PasswordUpdateDto dto)
         {
             var admin = await _unitOfWork.Admins.SelectByIdAsync(id);
             if (admin is null)
-                throw new StatusCodeException(System.Net.HttpStatusCode.NotFound, "Admin is not found");
+                throw new StatusCodeException(HttpStatusCode.NotFound, "Admin is not found");
             _unitOfWork.Admins.TrackingDeteched(admin);
             var res = PasswordHasher.Verify(dto.OldPassword, admin.Salt, admin.PasswordHash);
             if (res)
@@ -139,9 +158,9 @@ namespace SelenMebel.Service.Services.Admins
                         return true;
                     return false;
                 }
-                else throw new StatusCodeException(System.Net.HttpStatusCode.BadRequest, "new password and verify" + " password must be match!");
+                else throw new StatusCodeException(HttpStatusCode.BadRequest, "new password and verify" + " password must be match!");
             }
-            else throw new StatusCodeException(System.Net.HttpStatusCode.BadRequest, "Invalid Password");
+            else throw new StatusCodeException(HttpStatusCode.BadRequest, "Invalid Password");
         }
     }
 }
