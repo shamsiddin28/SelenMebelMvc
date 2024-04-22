@@ -216,12 +216,13 @@
                         var id = data;
 
                         // Redirect to the Create/Furniturefeature URL with the id as a query parameter
-                        window.location.href = `/Furniture/Edit?id=${id}`;
+                        window.location.href = `/Furniture/Edit/${id}`;
                     })
                     .catch(error => {
                         // Handle any errors that occurred during the fetch operation
                         console.error('There was a problem with your fetch operation:', error);
                     });
+                    
             }
         });
     </script>

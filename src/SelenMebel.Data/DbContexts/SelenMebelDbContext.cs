@@ -24,10 +24,6 @@ public class SelenMebelDbContext : DbContext
 	//public virtual DbSet<OrderDetail> OrderDetails { get; set; }
 	//public virtual DbSet<ShoppingCart> ShoppingCarts { get; set; }
 
-
-
-
-
 }
 
 

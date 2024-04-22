@@ -6,10 +6,10 @@ namespace SelenMebel.Service.DTOs.Categories;
 
 public class CategoryForUpdateDto
 {
-	[Required, MaxLength(40)]
+	[Required(ErrorMessage = "PLease enter the name of category!"), MaxLength(40)]
 	public string Name { get; set; }
 
-	[Required]
+	[Required(ErrorMessage = "PLease upload the image of category!")]
 	public IFormFile Image { get; set; }
 
 	public string ImagePath { get; set; } = string.Empty;

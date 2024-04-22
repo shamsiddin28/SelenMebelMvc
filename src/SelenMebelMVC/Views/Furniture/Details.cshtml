@@ -123,9 +123,10 @@ else if (TempData["ErrorMessage"] != null)
 	
 </form>
 
-<h3 class="text-center mb-5">Furniture Features</h3>
-<table class="table table-bordered table-responsive table-hover col-sm-10">
-	<thead>
+<h3 class="text-center mb-3">Furniture Features</h3>
+<div>
+    <table class="table table-bordered table-responsive table-hover col-sm-10">
+	    <thead>
 		<tr class="table-active">
 			<th>
 				@Html.DisplayName("Name")
@@ -144,7 +145,7 @@ else if (TempData["ErrorMessage"] != null)
 			</th>
 		</tr>
 	</thead>
-	<tbody>
+	    <tbody>
 		@if (Model != null && Model.FurnitureFeatures.Any())
 		{
 			@foreach (var furnitureFeature in Model.FurnitureFeatures)
@@ -182,5 +183,5 @@ else if (TempData["ErrorMessage"] != null)
 			</tr>
 		}
 	</tbody>
-
-</table>
+    </table>
+</div>

@@ -22,8 +22,8 @@ namespace SelenMebelMVC.Controllers
 		public ViewResult Register() => View("Register");
 
 		[HttpPost("register")]
-        [Authorize(Roles = "admin, superadmin")]
-        public async Task<IActionResult> AdminRegisterAsync(AdminRegisterDto adminRegisterDto)
+		[Authorize(Roles = "admin, superadmin")]
+		public async Task<IActionResult> AdminRegisterAsync(AdminRegisterDto adminRegisterDto)
 		{
 			if (ModelState.IsValid)
 			{

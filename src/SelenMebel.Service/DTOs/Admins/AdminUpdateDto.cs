@@ -14,7 +14,7 @@ public class AdminUpdateDto
 	public string LastName { get; set; } = string.Empty;
 
 	[AllowedFiles(new string[] { ".jpg", ".png", ".jpeg", ".svg", ".webp" }), MaxFile(2)]
-	public IFormFile Image { get; set; } 
+	public IFormFile Image { get; set; }
 	public string ImagePath { get; set; }
 
 	[Required(ErrorMessage = "Phone Number Required")]

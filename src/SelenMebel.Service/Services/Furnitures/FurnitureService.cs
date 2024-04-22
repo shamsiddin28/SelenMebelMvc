@@ -148,7 +148,7 @@ public class FurnitureService : IFurnitureService
 								|| x.Price.ToString().Contains(searchTerm.ToLower())
 								|| x.Id.ToString().Contains(searchTerm.ToLower()));
 		}
-		
+
 		var furniture = await query.OrderByDescending(x => x.CreatedAt)
 								  .Include(tof => tof.TypeOfFurniture)
 								  .ThenInclude(c => c.Category)
@@ -181,8 +181,6 @@ public class FurnitureService : IFurnitureService
 				.Include(tOF => tOF.TypeOfFurniture)
 				.ThenInclude(c => c.Category)
 				.Include(fF => fF.FurnitureFeatures)
-				//.Include(cD => cD.CartDetail)
-				//.Include(oD => oD.OrderDetail)
 				.AsNoTracking()
 				.FirstOrDefaultAsync() ??
 					throw new SelenMebelException(404, "Furniture is not found !");
@@ -195,12 +193,11 @@ public class FurnitureService : IFurnitureService
 		var byUniqueId = await _repository.SelectAll()
 				.Where(u => u.UniqueId.ToLower() == uniqueId.ToLower())
 				.Include(tOF => tOF.TypeOfFurniture)
+				.ThenInclude(c => c.Category)
 				.Include(fF => fF.FurnitureFeatures)
 				.AsNoTracking()
 				.FirstOrDefaultAsync() ??
 					throw new SelenMebelException(404, $"This Furniture {uniqueId} is not found !");
-				//.Include(cD => cD.CartDetail)
-				//.Include(oD => oD.OrderDetail)
 
 		return _mapper.Map<FurnitureForResultDto>(byUniqueId);
 	}

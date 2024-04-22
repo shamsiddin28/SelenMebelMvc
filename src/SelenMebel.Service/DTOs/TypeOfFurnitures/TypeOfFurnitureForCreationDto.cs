@@ -6,12 +6,12 @@ namespace SelenMebel.Service.DTOs.TypeOfFurnitures;
 
 public class TypeOfFurnitureForCreationDto
 {
-	[Required]
+	[Required(ErrorMessage = "PLease enter the TypeOfSelen!")]
 	public TypeOfSelen TypeOfSelen { get; set; }
 
-	[Required]
+	[Required(ErrorMessage = "Please upload the image of category!")]
 	public IFormFile Image { get; set; }
 
-	[Required]
+	[Required(ErrorMessage = "Please enter the CategoryId!")]
 	public long CategoryId { get; set; }
 }

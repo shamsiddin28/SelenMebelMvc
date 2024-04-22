@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using SelenMebel.Service.Helpers;
 using SelenMebelMVC.Configuration.LayerConfigurations;
 using SelenMebelMVC.Middllewares;
 using Serilog;
@@ -15,10 +16,10 @@ builder.Services.AddWeb(builder.Configuration);
 builder.Services.AddService();
 
 builder.Services.AddControllers()
-     .AddNewtonsoftJson(options =>
-     {
-         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-     });
+	 .AddNewtonsoftJson(options =>
+	 {
+		 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+	 });
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -59,10 +60,6 @@ builder.Services.AddCors(options =>
 		});
 });
 
-//builder.Services.AddControllers().AddNewtonsoftJson(options =>
-//				options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
-
-
 // Serialog
 var logger = new LoggerConfiguration()
    .ReadFrom.Configuration(builder.Configuration)
@@ -73,6 +70,9 @@ builder.Logging.AddSerilog(logger);
 
 
 var app = builder.Build();
+
+if (app.Services.GetService<IHttpContextAccessor>() != null)
+	HttpContextHelper.Accessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

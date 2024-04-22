@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SelenMebel.Service.Interfaces.Files;
 
-namespace SelenMebel.Api.Controllers.Files
+namespace SelenMebelMVC.Areas.Files
 {
 	public class FilesController : BaseController
 	{

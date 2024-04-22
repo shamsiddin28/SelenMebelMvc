@@ -7,7 +7,7 @@ using SelenMebel.Service.DTOs.Users;
 using SelenMebel.Service.Exceptions;
 using SelenMebel.Service.Interfaces.Users;
 
-namespace SelenMebel.Api.Controllers.Users
+namespace SelenMebelMVC.Areas.Users
 {
 	public class UsersController : BaseController
 	{
@@ -20,7 +20,7 @@ namespace SelenMebel.Api.Controllers.Users
 
 		[HttpPost("user/register"), AllowAnonymous]
 		public async Task<IActionResult> RegisterAsync([FromForm] UserRegisterDto dto)
-		=> Ok(await this._userService.UserRegisterAsync(dto));
+		=> Ok(await _userService.UserRegisterAsync(dto));
 
 		[HttpPost("user/login")]
 		public async Task<IActionResult> LoginAsync([FromForm] AccountLoginDto accountLoginDto)
@@ -35,29 +35,31 @@ namespace SelenMebel.Api.Controllers.Users
 						HttpOnly = true,
 						SameSite = SameSiteMode.Strict
 					});
-					return Ok(token);
+					return Ok(new { success = true, token });
 				}
 				catch (ModelErrorException modelError)
 				{
 					ModelState.AddModelError(modelError.Property, modelError.Message);
-					return RedirectToAction("Login", "Users");
+					return Unauthorized(new { success = false, message = "Invalid phonenumber or password" });
+
 				}
 				catch
 				{
-					return RedirectToAction("Login", "Users");
+					return Unauthorized(new { success = false, message = "Invalid phonenumber or password" });
 				}
 			}
-			else return RedirectToAction("Login", "Users");
+			else return BadRequest(ModelState);
+
 		}
 
-		[HttpGet("user/log-out")]
+		[HttpGet("user/logout")]
 		public IActionResult LogOut()
 		{
 			HttpContext.Response.Cookies.Append("X-Access-Token", "", new CookieOptions()
 			{
 				Expires = TimeHelper.GetCurrentServerTime().AddDays(-1)
 			});
-			return Ok("LogOut !");
+			return Ok(new { success = true, message = "Logout successful" });
 		}
 
 		[Authorize]
@@ -73,27 +75,27 @@ namespace SelenMebel.Api.Controllers.Users
 		[Authorize]
 		[HttpPut("{id}")]
 		public async Task<IActionResult> PutAsync([FromRoute(Name = "id")] long id, [FromForm] UserUpdateDto dto)
-			=> Ok(await this._userService.UpdateAsync(id, dto));
+			=> Ok(await _userService.UpdateAsync(id, dto));
 
 		[Authorize]
 		[HttpPatch("user/update-image/{id}")]
 		public async Task<IActionResult> UpdateImageAsync(long id, IFormFile formFile)
-			=> Ok(await this._userService.UpdateImageAsync(id, formFile));
+			=> Ok(await _userService.UpdateImageAsync(id, formFile));
 
 		[Authorize]
 		[HttpPost("user/password-update")]
 		public async Task<IActionResult> UpdatePasswordAsync(long id, PasswordUpdateDto dto)
-			=> Ok(await this._userService.UpdatePasswordAsync(id, dto));
+			=> Ok(await _userService.UpdatePasswordAsync(id, dto));
 
 		[Authorize]
 		[HttpDelete("delete/user/{id}")]
 		public async Task<IActionResult> DeleteAsync([FromRoute(Name = "id")] long id)
-			=> Ok(await this._userService.DeleteAsync(id));
+			=> Ok(await _userService.DeleteAsync(id));
 
 		[Authorize]
 		[HttpDelete("user/delete-image/{id}")]
 		public async Task<IActionResult> DeleteImageAsync([FromRoute(Name = "id")] long id)
-			=> Ok(await this._userService.DeleteImageAsync(id));
+			=> Ok(await _userService.DeleteImageAsync(id));
 
 	}
 }

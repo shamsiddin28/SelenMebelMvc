@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.IdentityModel.Tokens;
 using SelenMebel.Domain.Configurations;
-using SelenMebel.Domain.Entities.Furnitures;
 using SelenMebel.Service.DTOs.Categories;
 using SelenMebel.Service.Interfaces.Categories;
 
@@ -20,8 +17,8 @@ namespace SelenMebelMVC.Controllers
 		}
 
 		[HttpGet]
-        [Authorize(Roles = "admin, superadmin")]
-        public async Task<IActionResult> Index(string searchBy, string searchValue, int pageIndex = 1, int pageSize = 5)
+		[Authorize(Roles = "admin, superadmin")]
+		public async Task<IActionResult> Index(string searchBy, string searchValue, int pageIndex = 1, int pageSize = 5)
 		{
 
 			var categories = await _categoryService.RetrieveAllCategoriesAsync();
@@ -139,7 +136,7 @@ namespace SelenMebelMVC.Controllers
 				if (product is not null)
 				{
 					TempData["SuccessMessage"] = "Category Updated Successfully !";
-					return RedirectToAction("Index", "Products");
+					return RedirectToAction("Index", "Category");
 				}
 				else
 				{
@@ -157,8 +154,8 @@ namespace SelenMebelMVC.Controllers
 		}
 
 		[HttpGet]
-        [Authorize(Roles = "admin, superadmin")]
-        public IActionResult Create()
+		[Authorize(Roles = "admin, superadmin")]
+		public IActionResult Create()
 		{
 			return View();
 		}

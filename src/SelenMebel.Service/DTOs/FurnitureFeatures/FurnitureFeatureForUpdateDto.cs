@@ -5,13 +5,13 @@ namespace SelenMebel.Service.DTOs.FurnitureFeatures;
 
 public class FurnitureFeatureForUpdateDto
 {
-	[Required]
+	[Required(ErrorMessage = "PLease enter the name of furniturefeature!")]
 	public string Name { get; set; } = string.Empty;
 
-	[Required]
+	[Required(ErrorMessage = "PLease enter the value of furniturefeature!")]
 	public string Value { get; set; } = string.Empty;
 
-	[Required]
+	[Required(ErrorMessage = "PLease enter the FurnitureId of furniturefeature!")]
 	public long FurnitureId { get; set; }
 
 

@@ -114,7 +114,7 @@ namespace SelenMebel.Api
 				{
 					context.HttpContext.Response.Redirect("login");
 				}
-				
+
 			});
 			app.UseAuthentication();
 			app.UseAuthorization();

@@ -11,7 +11,7 @@ namespace SelenMebelMVC.Configuration.LayerConfigurations
 		{
 			AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.EnableLegacyTimestampBehavior", true);
 			string connectionString = configuration.GetConnectionString("DefaultConnection");
-			services.AddDbContext<SelenMebelDbContext>(options => 
+			services.AddDbContext<SelenMebelDbContext>(options =>
 			{
 				options.UseSqlServer(connectionString);
 				options.EnableSensitiveDataLogging();

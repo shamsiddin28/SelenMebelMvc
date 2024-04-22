@@ -20,7 +20,7 @@ namespace SelenMebel.Api.Controllers.Accounts
 		[Authorize(Roles = "admin, superadmin")]
 		[HttpPost("admin/register")]
 		public async Task<IActionResult> PostAsync([FromForm] AdminRegisterDto dto)
-			=> Ok(await this._accountService.AdminRegisterAsync(dto));	
+			=> Ok(await this._accountService.AdminRegisterAsync(dto));
 
 		[HttpPost("admin/login")]
 		public async Task<IActionResult> LoginAsync([FromForm] AccountLoginDto accountLoginDto)

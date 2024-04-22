@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SelenMebel.Domain.Configurations;
@@ -38,8 +37,8 @@ namespace SelenMebelMVC.Controllers
 		}
 
 		[HttpGet]
-        [Authorize(Roles = "admin, superadmin")]
-        public async Task<IActionResult> Index(string searchBy, string searchValue, int pageIndex = 1, int pageSize = 5)
+		[Authorize(Roles = "admin, superadmin")]
+		public async Task<IActionResult> Index(string searchBy, string searchValue, int pageIndex = 1, int pageSize = 5)
 		{
 			try
 			{
