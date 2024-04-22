@@ -7,7 +7,6 @@ using SelenMebel.Service.ViewModels.AdminViewModels;
 
 namespace SelenMebelMVC.Controllers
 {
-    [Authorize(Roles = "superadmin")]
     public class AdminsController : Controller
     {
         private readonly IAdminService _adminService;
@@ -20,6 +19,7 @@ namespace SelenMebelMVC.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "superadmin")]
         public async Task<IActionResult> Index(string searchValue)
         {
             List<AdminViewModel> admins;
@@ -36,6 +36,7 @@ namespace SelenMebelMVC.Controllers
             return View(admins);
         }
 
+        [Authorize(Roles = "superadmin")]
         public async Task<ViewResult> Profile()
         {
             var admin = await _adminService.GetByTokenAsync();
@@ -44,6 +45,7 @@ namespace SelenMebelMVC.Controllers
             return View();
         }
 
+        [Authorize(Roles = "superadmin")]
         public async Task<ViewResult> Update(long id)
         {
             try
@@ -60,7 +62,7 @@ namespace SelenMebelMVC.Controllers
                     ImagePath = admin.ImagePath,
 
                 };
-
+                ViewBag.AdminId = admin.Id;
                 return View("Update", adminUpdate);
 
             }
@@ -72,13 +74,14 @@ namespace SelenMebelMVC.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "superadmin")]
         public async Task<IActionResult> Update(long id, AdminUpdateDto dto)
         {
 
             try
             {
-                var product = await _adminService.UpdateAsync(id, dto);
-                if (product)
+                var updatedAdmin = await _adminService.UpdateAsync(id, dto);
+                if (updatedAdmin)
                 {
                     TempData["SuccessMessage"] = "Admin Updated Successfully !";
                     return RedirectToAction("Profile", "Admins");
@@ -94,6 +97,7 @@ namespace SelenMebelMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "superadmin")]
         public async Task<ViewResult> Remove(long id)
         {
             try
@@ -131,6 +135,61 @@ namespace SelenMebelMVC.Controllers
 
                 throw new Exception(ex.Message);
             }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "superadmin")]
+        public async Task<ViewResult> UpdatePassword(long id)
+        {
+            try
+            {
+                var admin = await _adminService.GetByIdAsync(id);
+
+                var passwordUpdateDto = new PasswordUpdateDto();
+
+                return View(nameof(UpdatePassword), passwordUpdateDto);
+
+            }
+            catch (Exception ex)
+            {
+                TempData["InfoMessage"] = $"{ex.Message}";
+                throw ;
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "superadmin")]
+        public async Task<IActionResult> UpdatePassword(long id, PasswordUpdateDto dto)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var result = await _adminService.UpdatePasswordAsync(id, dto);
+                    if (result)
+                    {
+                        TempData["SuccessMessage"] = "Admin Password Updated Successfully !";
+                        return await Update(id);
+                    }
+                    else
+                    {
+                        TempData["InfoMessage"] = "Invalid password!";
+                        return View(nameof(UpdatePassword), id);
+                    }
+                }
+                else
+                {
+                    ModelState.Clear();
+                    TempData["InfoMessage"] = "Please provide all the required fields!";
+                    return View(nameof(UpdatePassword), id);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["InfoMessage"] = $"{ex.Message}";
+                throw new Exception(ex.Message);
+            }
+            
         }
     }
 }

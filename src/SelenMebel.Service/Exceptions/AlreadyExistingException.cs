@@ -2,11 +2,11 @@
 
 public class AlreadyExistingException : Exception
 {
-    public string Point { get; set; } = string.Empty;
+	public string Point { get; set; } = string.Empty;
 
-    public AlreadyExistingException(string point, string message)
-        : base(message)
-    {
-        this.Point = point;
-    }
+	public AlreadyExistingException(string point, string message)
+		: base(message)
+	{
+		this.Point = point;
+	}
 }

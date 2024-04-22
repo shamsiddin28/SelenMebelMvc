@@ -42,6 +42,7 @@ else if (TempData["ErrorMessage"] != null)
                 <label asp-for="CategoryId" class="col-sm-4 col-form-label">Category</label>
                 <div class="col-sm-8">
                     <select id="mySelect" asp-for="CategoryId" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container" required>
+                        <option value="0">Choose one of the categories</option>
                         @{
                             var categories = ViewBag.Categories;
                             foreach (var category in categories)
@@ -102,23 +103,25 @@ else if (TempData["ErrorMessage"] != null)
             var selectedValue = this.value;
 
             // Fetch request
-            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`)
+            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`, {
+                method: 'GET',
+                })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        throw new Error("There is not available TypeOfSelen for this category in the database");
                     }
                     return response.json();
                 })
                 .then(data => {
                     // Handle response data accordingly
-                    var typeOfFurnitures = data.typeOfFurnitures;
+                    var typeOfFurnitures = data;
                     // Clear the select options
                     $('#typeOfSelenSelect').empty();
 
                     // Populate the select options with typeOfSelen enums
                     if (typeOfFurnitures.length === 0) {
                         $('#typeOfSelenSelect').append(`<option value="0">Not Available</option>`);
-                        alert(`For this category not available the typeOfFurnitures !`)
+                        alert(`There is not available TypeOfSelen for this category in the database !`)
 
                     } else {
                         typeOfFurnitures.forEach(furniture => {
@@ -146,7 +149,7 @@ else if (TempData["ErrorMessage"] != null)
                     }
                 })
                 .catch(error => {
-                    alert('There was a problem with your fetch operation:', error);
+                    alert('Error: ' + error.message)
                 });
         };
     </script>

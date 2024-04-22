@@ -2,11 +2,11 @@
 
 public class ModelErrorException : Exception
 {
-    public string Property { get; set; } = string.Empty;
+	public string Property { get; set; } = string.Empty;
 
-    public ModelErrorException(string property, string message)
-        : base(message)
-    {
-        this.Property = property;
-    }
+	public ModelErrorException(string property, string message)
+		: base(message)
+	{
+		this.Property = property;
+	}
 }

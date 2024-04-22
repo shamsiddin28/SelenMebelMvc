@@ -54,6 +54,7 @@
 
   <ItemGroup>
     <Folder Include="Logs\" />
+    <Folder Include="wwwroot\CategoryImages\Images\" />
     <Folder Include="wwwroot\FurnitureImages\Images\" />
     <Folder Include="wwwroot\media\avatars\" />
     <Folder Include="wwwroot\media\images\" />

@@ -17,7 +17,7 @@ namespace SelenMebel.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -71,69 +71,6 @@ namespace SelenMebel.Data.Migrations
                     b.ToTable("Admins");
                 });
 
-            modelBuilder.Entity("SelenMebel.Domain.Entities.Carts.CartDetail", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("FurnitureId")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("Quantity")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("ShoppingCartId")
-                        .HasColumnType("bigint");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FurnitureId");
-
-                    b.ToTable("CartDetail");
-                });
-
-            modelBuilder.Entity("SelenMebel.Domain.Entities.Carts.ShoppingCart", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ShoppingCart");
-                });
-
             modelBuilder.Entity("SelenMebel.Domain.Entities.Categories.Category", b =>
                 {
                     b.Property<long>("Id")
@@ -143,9 +80,7 @@ namespace SelenMebel.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Image")
                         .IsRequired()
@@ -155,7 +90,6 @@ namespace SelenMebel.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("nvarchar(40)");
 
@@ -176,12 +110,9 @@ namespace SelenMebel.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
@@ -190,12 +121,9 @@ namespace SelenMebel.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -206,7 +134,6 @@ namespace SelenMebel.Data.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("UniqueId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -228,9 +155,7 @@ namespace SelenMebel.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<long>("FurnitureId")
                         .HasColumnType("bigint");
@@ -239,14 +164,12 @@ namespace SelenMebel.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Value")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -268,18 +191,13 @@ namespace SelenMebel.Data.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<int>("TypeOfSelen")
                         .HasColumnType("int");
@@ -292,76 +210,6 @@ namespace SelenMebel.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("TypeOfFurniture");
-                });
-
-            modelBuilder.Entity("SelenMebel.Domain.Entities.Orders.Order", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<int>("OrderStatus")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Order");
-                });
-
-            modelBuilder.Entity("SelenMebel.Domain.Entities.Orders.OrderDetail", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("FurnitureId")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("OrderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("Quantity")
-                        .HasColumnType("bigint");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FurnitureId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderDetail");
                 });
 
             modelBuilder.Entity("SelenMebel.Domain.Entities.User", b =>
@@ -410,17 +258,6 @@ namespace SelenMebel.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SelenMebel.Domain.Entities.Carts.CartDetail", b =>
-                {
-                    b.HasOne("SelenMebel.Domain.Entities.Furnitures.Furniture", "Furniture")
-                        .WithMany("CartDetail")
-                        .HasForeignKey("FurnitureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Furniture");
-                });
-
             modelBuilder.Entity("SelenMebel.Domain.Entities.Furnitures.Furniture", b =>
                 {
                     b.HasOne("SelenMebel.Domain.Entities.Furnitures.TypeOfFurniture", "TypeOfFurniture")
@@ -454,25 +291,6 @@ namespace SelenMebel.Data.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("SelenMebel.Domain.Entities.Orders.OrderDetail", b =>
-                {
-                    b.HasOne("SelenMebel.Domain.Entities.Furnitures.Furniture", "Furniture")
-                        .WithMany("OrderDetail")
-                        .HasForeignKey("FurnitureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SelenMebel.Domain.Entities.Orders.Order", "Order")
-                        .WithMany("OrderDetail")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Furniture");
-
-                    b.Navigation("Order");
-                });
-
             modelBuilder.Entity("SelenMebel.Domain.Entities.Categories.Category", b =>
                 {
                     b.Navigation("TypeOfFurnitures");
@@ -480,21 +298,12 @@ namespace SelenMebel.Data.Migrations
 
             modelBuilder.Entity("SelenMebel.Domain.Entities.Furnitures.Furniture", b =>
                 {
-                    b.Navigation("CartDetail");
-
                     b.Navigation("FurnitureFeatures");
-
-                    b.Navigation("OrderDetail");
                 });
 
             modelBuilder.Entity("SelenMebel.Domain.Entities.Furnitures.TypeOfFurniture", b =>
                 {
                     b.Navigation("Furnitures");
-                });
-
-            modelBuilder.Entity("SelenMebel.Domain.Entities.Orders.Order", b =>
-                {
-                    b.Navigation("OrderDetail");
                 });
 #pragma warning restore 612, 618
         }

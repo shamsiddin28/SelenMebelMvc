@@ -11,7 +11,7 @@
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <p>Do you want to add new TypeOfFurniture? Click <a href="https://localhost:7005/TypeOfFurniture/Create">here</a></p>
+        <p>Do you want to add new TypeOfFurniture? Click <a asp-action="Create" asp-controller="TypeOfFurniture">here</a></p>
     </div>
 </div>
 
@@ -83,13 +83,6 @@
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
             </div>
-            @* <div class="row mb-3">
-                <label class="col-sm-4 col-form-label">Old Description</label>
-                <div class="col-sm-8">
-                    <textarea class="form-control" disabled>@ViewBag.Description</textarea>
-                    <span class="text-danger"></span>
-                </div>
-            </div> *@
             <div class="row mb-3">
                 <label asp-for="Description" class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-8">
@@ -164,23 +157,29 @@
             var selectedValue = this.value;
 
             // Fetch request
-            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`)
+            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`, {
+                method: 'GET',
+            })
                 .then(response => {
                     if (!response.ok) {
+                        console.error(`HTTP status code: ${response.status}`);
+                        response.text().then(text => console.error(`Response text: ${text}`));
                         throw new Error('Network response was not ok');
                     }
-                    return response.json();
+                    else {
+                        return response.json();
+                    }
                 })
                 .then(data => {
                     // Handle response data accordingly
-                    var typeOfFurnitures = data.typeOfFurnitures;
+                    var typeOfFurnitures = data;
                     // Clear the select options
                     $('#typeOfSelenSelect').empty();
 
                     // Populate the select options with typeOfSelen enums
                     if (typeOfFurnitures.length === 0) {
                         $('#typeOfSelenSelect').append(`<option value="0">No Selected</option>`);
-                        alert("For this category have not the typeOfFurnitures !")
+                        alert("There is not available TypeOfSelen for this category in the database !")
                         $('#myBtn').show();
                     } else {
                         $('#myBtn').hide();

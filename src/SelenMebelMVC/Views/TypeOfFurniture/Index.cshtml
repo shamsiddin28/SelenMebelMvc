@@ -3,7 +3,7 @@
 	ViewData["Title"] = "TypeOfFurniture List";
 }
 
-<h3 class="text-center mb-5">@ViewData["Title"]</h3>
+<h3 class="text-center mb-3">@ViewData["Title"]</h3>
 
 @if (TempData["InfoMessage"] != null)
 {
@@ -33,7 +33,7 @@ else if (TempData["ErrorMessage"] != null)
 	</div>
 }
 
-<div class="row mb-5">
+<div class="row mb-2">
 	<div class="col">
 		<a class='btn btn-primary' href='/TypeOfFurniture/Create'>Create New TypeOfFurniture</a>
 	</div>
@@ -42,14 +42,14 @@ else if (TempData["ErrorMessage"] != null)
 	</div>
 </div>
 
-<div class="row mb-5">
+<div class="row mb-3">
 	@using (Html.BeginForm("Index", "TypeOfFurniture", FormMethod.Get))
 	{
 		<table>
 			<tr>
 				<td>
 					<span><b>Search By:</b></span>
-					@Html.RadioButton("searchBy", "CategoryName")
+					@Html.RadioButton("searchBy", "CategoryName", true)
 					<text>Category Name</text>
 					@Html.RadioButton("searchBy", "TypeOfSelen")
 					<text>TypeOfSelen</text>
@@ -76,7 +76,7 @@ else if (TempData["ErrorMessage"] != null)
 			var pageIndex = ViewData["PageIndex"] != null ? (int)ViewData["PageIndex"] : 1;
 			var pageSize = ViewData["PageSize"] != null ? (int)ViewData["PageSize"] : 10;
 			var totalItems = ViewData["TotalItems"];
-			var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+			var totalPages = ViewData["TotalItems"] != null ? (int)Math.Ceiling((int)totalItems / (double)pageSize) : 1;
 
 			var searchBy = ViewData["SearchBy"];
 			var searchValue = ViewData["SearchValue"];
@@ -107,8 +107,8 @@ else if (TempData["ErrorMessage"] != null)
 		}
 	</ul>
 </nav>
-
-<table class="table table-bordered table-responsive table-hover">
+<div style="height: 400px; overflow-y: auto;">
+	<table class="table table-bordered table-responsive table-hover">
 	<thead>
 		<tr class="table-active">
 			<th>
@@ -144,7 +144,7 @@ else if (TempData["ErrorMessage"] != null)
 						@Html.DisplayFor(model => typeOfFurniture.TypeOfSelen)
 					</td>
 					<td>
-						<img src="~/TypeOfFurnitureImages/Images/@typeOfFurniture.Image" alt="" width=100 />
+						<img src="~/@typeOfFurniture.Image" alt="" width=100 />
 					</td>
 					<td>
 						@Html.DisplayFor(model => typeOfFurniture.CreatedAt)
@@ -174,4 +174,5 @@ else if (TempData["ErrorMessage"] != null)
 	</tbody>
 
 </table>
+</div>
 

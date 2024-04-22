@@ -3,7 +3,7 @@
     ViewData["Title"] = "Admins";
 }
 
-<h3 class="text-center mb-5">@ViewData["Title"]</h3>
+<h3 class="text-center mb-2">@ViewData["Title"]</h3>
 
 @if (TempData["InfoMessage"] != null)
 {
@@ -34,7 +34,7 @@ else if (TempData["ErrorMessage"] != null)
 }
 
 
-<div class="row mb-5">
+<div class="row mb-2">
 	<div class="col">
 		<a class='btn btn-primary' asp-action="Register" asp-controller="Accounts">Register Admin</a>
 	</div>
@@ -42,7 +42,7 @@ else if (TempData["ErrorMessage"] != null)
 	</div>
 </div>
 
-<div class="row mb-5">
+<div class="row mb-2">
 	@using (Html.BeginForm("Index", "Admins", FormMethod.Get))
 	{
 		<table>
@@ -70,100 +70,101 @@ else if (TempData["ErrorMessage"] != null)
 	}
 </div>
 
-<table class="table table-bordered table-responsive table-hover">
-	<thead>
-		<tr class="table-active">
-			<th>
-				@Html.DisplayNameFor(model => model.FirstName)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.LastName)
-			</th>
-			<th>
-				@Html.DisplayName("Image")
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.BirthDate)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.Address)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.PhoneNumber)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.Role)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.CreatedAt)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.UpdatedAt)
-			</th>
-			<th>
-				Action
-			</th>
-		</tr>
-	</thead>
-	<tbody>
-		@if (Model != null && Model.Any())
-		{
-			@foreach (var admin in Model)
+<div style="height: 400px; overflow-y: auto;">
+	<table class="table table-bordered table-responsive table-hover">
+		<thead>
+			<tr class="table-active">
+				<th>
+					@Html.DisplayNameFor(model => model.FirstName)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.LastName)
+				</th>
+				<th>
+					@Html.DisplayName("Image")
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.BirthDate)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.Address)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.PhoneNumber)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.Role)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.CreatedAt)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.UpdatedAt)
+				</th>
+				<th>
+					Action
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			@if (Model != null && Model.Any())
+			{
+				@foreach (var admin in Model)
+				{
+					<tr>
+						<td>
+							@Html.DisplayFor(model => admin.FirstName)
+						</td>
+						<td>
+							@Html.DisplayFor(model => admin.LastName)
+						</td>
+						<td>
+							@if (string.IsNullOrEmpty(admin.ImagePath))
+							{
+								<img src="~/media/avatars/150-26.jpg" class="rounded-circle" style="max-width: 100px; max-height: 100px;" />
+							}
+							else
+							{
+								<img src="~/@admin.ImagePath" class="rounded-circle" style="max-width: 100px; max-height: 100px;" />
+							}
+						</td>
+						<td>
+							@Html.DisplayFor(model => admin.BirthDate)
+						</td>
+						<td>
+							@Html.DisplayFor(model => admin.Address)
+						</td>
+						<td>
+							@Html.DisplayFor(model => admin.PhoneNumber)
+						</td>
+						<td>
+							@Html.DisplayFor(model => admin.Role)
+						</td>
+						<td>
+							@Html.DisplayFor(model => admin.CreatedAt)
+						</td>
+						<td>
+							@Html.DisplayFor(model => admin.UpdatedAt)
+						</td>
+						<td style="white-space:nowrap">
+							<div class="btn-group btn-group-sm">
+								<a asp-action="Update" asp-route-id="@admin.Id" class="btn btn-primary btn-sm">Update</a>
+								<a asp-action="Remove" asp-route-id="@admin.Id" class="btn btn-danger btn-sm">Remove</a>
+							</div>
+						</td>
+					</tr>
+				}
+			}
+			else
 			{
 				<tr>
-					<td>
-						@Html.DisplayFor(model => admin.FirstName)
-					</td>
-					<td>
-						@Html.DisplayFor(model => admin.LastName)
-					</td>
-					<td>
-						@if (string.IsNullOrEmpty(admin.ImagePath))
-						{
-							<img src="~/media/avatars/150-26.jpg" class="rounded-circle" style="max-width: 100px; max-height: 100px;" />
-						}
-						else
-						{
-							<img src="~/@admin.ImagePath" class="rounded-circle" style="max-width: 100px; max-height: 100px;" />
-						}
-					</td>
-					<td>
-						@Html.DisplayFor(model => admin.BirthDate)
-					</td>
-					<td>
-						@Html.DisplayFor(model => admin.Address)
-					</td>
-					<td>
-						@Html.DisplayFor(model => admin.PhoneNumber)
-					</td>
-					<td>
-						@Html.DisplayFor(model => admin.Role)
-					</td>
-					<td>
-						@Html.DisplayFor(model => admin.CreatedAt)
-					</td>
-					<td>
-						@Html.DisplayFor(model => admin.UpdatedAt)
-					</td>
-					<td style="white-space:nowrap">
-						<div class="btn-group btn-group-sm">
-							<a asp-action="Update" asp-route-id="@admin.Id" class="btn btn-primary btn-sm">Update</a>
-							<a asp-action="Remove" asp-route-id="@admin.Id" class="btn btn-danger btn-sm">Remove</a>
+					<td colspan="2">
+						<div>
+							Admins not available in the database
 						</div>
 					</td>
 				</tr>
 			}
-		}
-		else
-		{
-			<tr>
-				<td colspan="2">
-					<div>
-						Admins not available in the database
-					</div>
-				</td>
-			</tr>
-		}
-	</tbody>
-
-</table>
+		</tbody>
+	</table>
+</div>

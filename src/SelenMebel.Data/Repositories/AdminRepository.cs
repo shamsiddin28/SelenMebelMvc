@@ -7,7 +7,7 @@ namespace SelenMebel.Data.Repositories;
 
 public class AdminRepository : GenericRepository<Admin>, IAdminRepository
 {
-    public AdminRepository(SelenMebelDbContext selenMebelDbContext) : base(selenMebelDbContext)
-    {
-    }
+	public AdminRepository(SelenMebelDbContext selenMebelDbContext) : base(selenMebelDbContext)
+	{
+	}
 }

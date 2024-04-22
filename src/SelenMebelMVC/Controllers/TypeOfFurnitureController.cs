@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using SelenMebel.Domain.Configurations;
 using SelenMebel.Domain.Entities.Furnitures;
 using SelenMebel.Domain.Enums;
 using SelenMebel.Service.DTOs.TypeOfFurnitures;
@@ -8,8 +10,7 @@ using SelenMebel.Service.Interfaces.TypeOfFurnitures;
 
 namespace SelenMebelMVC.Controllers
 {
-    [Authorize(Roles = "admin, superadmin")]
-    public class TypeOfFurnitureController : Controller
+	public class TypeOfFurnitureController : Controller
     {
         private readonly ITypeOfFurnitureService _typeOfFurnitureService;
         private readonly ICategoryService _categoryService;
@@ -23,13 +24,20 @@ namespace SelenMebelMVC.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string searchBy, string searchValue, int pageIndex = 1, int pageSize = 3)
+        [Authorize(Roles = "admin, superadmin")]
+        public async Task<IActionResult> Index(string searchBy, string searchValue, int pageIndex = 1, int pageSize = 5)
         {
             try
             {
                 var typeOfFurnitures = await _typeOfFurnitureService.RetrieveAllTypeOfFurnituresAsync();
                 int totalItems = typeOfFurnitures.Count();
                 var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+                var paginationParams = new PaginationParams
+                {
+                    PageSize = pageSize, // Set the page size
+                    PageIndex = pageIndex // Set the page index
+                };
 
                 if (typeOfFurnitures.Any())
                 {
@@ -42,17 +50,23 @@ namespace SelenMebelMVC.Controllers
 
                     if (string.IsNullOrEmpty(searchValue))
                     {
-                        TempData["InfoMessage"] = "Please provide the search value.";
-                        return View(typeOfFurnitures);
+                        //TempData["InfoMessage"] = "Please provide the search value.";
+                        var byPagination = await _typeOfFurnitureService.RetrieveAllAsync(paginationParams);
+                        return View(byPagination);
                     }
                     else
                     {
                         ViewData["SearchBy"] = searchBy;
                         ViewData["SearchValue"] = searchValue;
+                        if (searchBy.IsNullOrEmpty())
+                        {
+                            searchBy = "categoryname";
+                        }
                         for (int i = 1; i <= totalPages; i++)
                         {
-                            var result = typeOfFurnitures.Skip((i - 1) * pageSize).Take(pageSize);
-                            if (searchBy.ToLower() == "category")
+                            //var result = typeOfFurnitures.Skip((i - 1) * pageSize).Take(pageSize);
+                            var result = typeOfFurnitures;
+                            if (searchBy.ToLower() == "categoryname")
                             {
                                 var searchByCategoryName = result.Where(f => f.Category.Name.ToString().ToLower().Contains(searchValue.ToLower()));
                                 if (searchByCategoryName.Any())
@@ -102,7 +116,8 @@ namespace SelenMebelMVC.Controllers
         }
 
         [HttpGet]
-        public async Task<ViewResult> Create()
+		[Authorize(Roles = "admin, superadmin")]
+		public async Task<ViewResult> Create()
         {
             var categories = await _categoryService.RetrieveAllCategoriesAsync();
             if (categories is not null)
@@ -119,40 +134,14 @@ namespace SelenMebelMVC.Controllers
 
         }
 
-        private bool IsExistOrNoTypeOfFurnituresForCreate(TypeOfFurnitureForCreationDto model)
+        private bool IsExistOnDbTypeOfFurnitures(TypeOfSelen typeOfSelen, long categoryId)
         {
-            var typeOfSelens = new List<TypeOfSelen>();
-            var typeOf = _categoryService.RetrieveByIdAsync(model.CategoryId).Result.TypeOfFurnitures;
+            var typeOf = _categoryService.RetrieveByIdAsync(categoryId).Result.TypeOfFurnitures;
 
-            var typeOfSelen = typeOf.Select(f => f.TypeOfSelen);
-            foreach (var item2 in typeOfSelen)
-            {
-                typeOfSelens.Add(item2);
-            }
+            var typeOfSelens = typeOf.Select(f => f.TypeOfSelen);
             foreach (var item in typeOfSelens)
             {
-                if (item == model.TypeOfSelen)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool IsExistOrNoTypeOfFurnituresForUpdate(TypeOfFurnitureForUpdateDto model)
-        {
-            var typeOfSelens = new List<TypeOfSelen>();
-            var typeOf = _categoryService.RetrieveByIdAsync(model.CategoryId).Result.TypeOfFurnitures;
-
-            var typeOfSelen = typeOf.Select(f => f.TypeOfSelen);
-            foreach (var item2 in typeOfSelen)
-            {
-                typeOfSelens.Add(item2);
-            }
-            foreach (var item in typeOfSelens)
-            {
-                if (item == model.TypeOfSelen)
+                if (item == typeOfSelen)
                 {
                     return true;
                 }
@@ -179,7 +168,7 @@ namespace SelenMebelMVC.Controllers
                     ModelState.AddModelError("TypeOfFurnitureForCreationDto.CategoryId", "The CategoryId is required");
                 }
 
-                if (IsExistOrNoTypeOfFurnituresForCreate(model) == true)
+                if (IsExistOnDbTypeOfFurnitures(model.TypeOfSelen, model.CategoryId) == true)
                 {
                     TempData["ErrorMessage"] = "This TypeOfSelen is already exist !";
                     ModelState.AddModelError("TypeOfFurnitureForCreationDto.TypeOfSelen", "This TypeOfSelen is already exist !");
@@ -214,7 +203,8 @@ namespace SelenMebelMVC.Controllers
         }
 
         [HttpGet]
-        public async Task<ViewResult> Edit(long id)
+		[Authorize(Roles = "admin, superadmin")]
+		public async Task<ViewResult> Edit(long id)
         {
             var typeOfFurniture = await _typeOfFurnitureService.RetrieveByIdAsync(id);
             if (typeOfFurniture is not null)
@@ -260,7 +250,7 @@ namespace SelenMebelMVC.Controllers
                 ModelState.AddModelError("TypeOfFurnitureForUpdateDto.Image", "The image file is required");
             }
 
-            if (IsExistOrNoTypeOfFurnituresForUpdate(model) == true)
+            if (IsExistOnDbTypeOfFurnitures(model.TypeOfSelen, model.CategoryId) == true)
             {
                 TempData["ErrorMessage"] = "This TypeOfSelen is already exist !";
                 ModelState.AddModelError("TypeOfFurnitureForCreationDto.TypeOfSelen", "This TypeOfSelen is already exist !");
@@ -290,7 +280,8 @@ namespace SelenMebelMVC.Controllers
         }
 
         [HttpGet]
-        public async Task<ViewResult> Delete(long id)
+		[Authorize(Roles = "admin, superadmin")]
+		public async Task<ViewResult> Delete(long id)
         {
             var typeOfFurniture = await _typeOfFurnitureService.RetrieveByIdAsync(id);
             if (typeOfFurniture is not null) return View(nameof(Delete), typeOfFurniture);

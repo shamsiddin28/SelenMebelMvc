@@ -3,7 +3,7 @@
 	ViewData["Title"] = "FurnitureFeatures";
 }
 
-<h3 class="text-center mb-5">@ViewData["Title"]</h3>
+<h3 class="text-center mb-3">@ViewData["Title"]</h3>
 
 @if (TempData["InfoMessage"] != null)
 {
@@ -33,7 +33,15 @@ else if (TempData["ErrorMessage"] != null)
 	</div>
 }
 
-<div class="row mb-5">
+<div class="row mb-2">
+	<div class="col">
+		<a id="createFeatureBtn" class='btn btn-primary' >Create New FurnitureFeature</a>
+	</div>
+	<div class="col">
+	</div>
+</div>
+
+<div class="row mb-3">
 	@using (Html.BeginForm("Index", "FurnitureFeature", FormMethod.Get))
 	{
 		<table>
@@ -71,7 +79,7 @@ else if (TempData["ErrorMessage"] != null)
 			var pageIndex = ViewData["PageIndex"] != null ? (int)ViewData["PageIndex"] : 1;
 			var pageSize = ViewData["PageSize"] != null ? (int)ViewData["PageSize"] : 10;
 			var totalItems = ViewData["TotalItems"];
-			var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+			var totalPages = ViewData["TotalItems"] != null ? (int)Math.Ceiling((int)totalItems / (double)pageSize) : 1;
 
 			var searchBy = ViewData["SearchBy"];
 			var searchValue = ViewData["SearchValue"];
@@ -103,7 +111,8 @@ else if (TempData["ErrorMessage"] != null)
 	</ul>
 </nav>
 
-<table class="table table-bordered table-responsive table-hover">
+<div style="height: 400px; overflow-y: auto;">
+	<table class="table table-bordered table-responsive table-hover">
 	<thead>
 		<tr class="table-active">
 			<th>
@@ -191,3 +200,39 @@ else if (TempData["ErrorMessage"] != null)
 	</tbody>
 
 </table>
+</div>
+
+<script>
+	// Add click event listener to the button
+	document.getElementById("createFeatureBtn").addEventListener("click", function () {
+		// Get input value from the user
+		var inputValue = prompt("Please enter the Furniture UniqueId:");
+
+		// Make sure user entered a value
+		if (inputValue !== null) {
+			// Send AJAX request to the controller action
+			fetch(`/FurnitureFeature/GetByFurnitureUniqueId?uniqueId=${inputValue}`, {
+				method: 'GET', // Assuming you want to send a GET request
+			})
+				.then(response => {
+					// Check if the response is successful
+					if (!response.ok) {
+						throw new Error('Network response was not ok');
+					}
+					// Parse response as JSON
+					return response.json();
+				})
+				.then(data => {
+					// Extract the id from the response
+					var id = data;
+
+					// Redirect to the Create/Furniturefeature URL with the id as a query parameter
+					window.location.href = `/FurnitureFeature/Create?id=${id}`;
+				})
+				.catch(error => {
+					// Handle any errors that occurred during the fetch operation
+					console.error('There was a problem with your fetch operation:', error);
+				});
+		}
+	});
+</script>

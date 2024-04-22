@@ -50,9 +50,14 @@
                 <textarea id="address" class="form-control" readonly>@Model.Address</textarea>
             </div>
 
-            <div class="btn-group btn-group-sm">
+            <div class="btn-group btn-group-sm mt-2">
                 <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">Update</a>
-                <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Admins" role="button">Cancel</a>
+            </div>
+            <div class="btn-group btn-group-sm mt-2">
+                <a class="btn btn-outline-primary mt" asp-action="Index" asp-controller="Admins" role="button">Cancel</a>
+            </div>
+            <div class="btn-group btn-group-sm mt-2">
+                <a asp-action="UpdatePassword" asp-route-id="@Model.Id" asp-controller="Admins" class="btn btn-outline-success btn-sm">Update Password</a>
             </div>
         </div>
     </div>

@@ -3,7 +3,7 @@
 	ViewData["Title"] = "Category List";
 }
 
-<h3 class="text-center mb-5">@ViewData["Title"]</h3>
+<h3 class="text-center mb-2">@ViewData["Title"]</h3>
 
 @if (TempData["InfoMessage"] != null)
 {
@@ -34,22 +34,22 @@ else if (TempData["ErrorMessage"] != null)
 }
 
 
-<div class="row mb-5">
+<div class="row mb-2">
 	<div class="col">
-		<a class='btn btn-primary' href='/Category/Create'>Create New Category</a>
+		<a class='btn btn-primary' asp-action="Create" asp-controller="Category" >Create New Category</a>
 	</div>
 	<div class="col">
 	</div>
 </div>
 
-<div class="row mb-5">
+<div class="row mb-3">
 	@using (Html.BeginForm("Index", "Category", FormMethod.Get))
 	{
 		<table>	
 			<tr>
 				<td>
 					<span><b>Search By:</b></span>
-					@Html.RadioButton("searchBy", "CategoryName")
+					@Html.RadioButton("searchBy", "CategoryName", true)
 					<text>Category Name</text>
 				</td>
 			</tr>
@@ -74,7 +74,7 @@ else if (TempData["ErrorMessage"] != null)
 			var pageIndex = ViewData["PageIndex"] != null ? (int)ViewData["PageIndex"] : 1;
 			var pageSize = ViewData["PageSize"] != null ? (int)ViewData["PageSize"] : 10;
 			var totalItems = ViewData["TotalItems"];
-			var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+			var totalPages = ViewData["TotalItems"] != null ? (int)Math.Ceiling((int)totalItems / (double)pageSize) : 1;
 
 			var searchBy = ViewData["SearchBy"];
 			var searchValue = ViewData["SearchValue"];
@@ -105,8 +105,8 @@ else if (TempData["ErrorMessage"] != null)
 		}
 	</ul>
 </nav>
-
-<table class="table table-bordered table-responsive table-hover">
+<div style="height: 400px; overflow-y: auto;">
+	<table class="table table-bordered table-responsive table-hover">
 	<thead>
 		<tr class="table-active">
 			<th>
@@ -136,7 +136,7 @@ else if (TempData["ErrorMessage"] != null)
 						@Html.DisplayFor(model => category.Name)
 					</td>
 					<td>
-						<img src="~/CategoryImages/Images/@category.Image" alt="" width=100 />
+						<img src="~/@category.Image" alt="" width=100 />
 					</td>
 					<td>
 						@Html.DisplayFor(model => category.CreatedAt)
@@ -166,3 +166,4 @@ else if (TempData["ErrorMessage"] != null)
 	</tbody>
 
 </table>
+</div>

@@ -5,9 +5,9 @@ namespace SelenMebel.Service.DTOs.Orders;
 
 public class OrderForCreationDto
 {
-    [Required]
-    public string UserId { get; set; }
+	[Required]
+	public string UserId { get; set; }
 
-    [Required]
-    public OrderStatus OrderStatus { get; set; }
+	[Required]
+	public OrderStatus OrderStatus { get; set; }
 }

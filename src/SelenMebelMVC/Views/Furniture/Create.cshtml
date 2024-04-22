@@ -7,6 +7,36 @@
     ViewData["Title"] = "Create Furniture";
 }
 
+
+@if (TempData["InfoMessage"] != null)
+{
+    <div class='alert alert-info alert-dismissible fade show' role='alert'>
+        <strong>Information ! </strong> @TempData["InfoMessage"]
+        <button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+            <span>&times;</span>
+        </button>
+    </div>
+}
+else if (TempData["SuccessMessage"] != null)
+{
+    <div class='alert alert-success alert-dismissible fade show' role='alert'>
+        <strong>Success ! </strong> @TempData["SuccessMessage"]
+        <button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+            <span>&times;</span>
+        </button>
+    </div>
+}
+else if (TempData["ErrorMessage"] != null)
+{
+    <div class='alert alert-danger alert-dismissible fade show' role='alert'>
+        <strong>Error ! </strong> @TempData["ErrorMessage"]
+        <button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+            <span>&times;</span>
+        </button>
+    </div>
+}
+
+
 <!-- Modal -->
 <div id="myModal" class="modal">
     <div class="modal-content">
@@ -24,11 +54,12 @@
                 <label class="col-sm-4 col-form-label">Category</label>
                 <div class="col-sm-8">
                     <select id="mySelect" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container">
+                        <option value="0">Choose one of the categories</option>
                         @{
                             var categories = ViewBag.Categories;
                             foreach (var category in categories)
                             {
-                                <option value="@category.Id.ToString()">@category.Name.ToString()</option>
+                                        <option value="@category.Id.ToString()">@category.Name.ToString()</option>
                             }
                         }
                     </select>
@@ -99,23 +130,30 @@
             var selectedValue = this.value;
 
             // Fetch request
-            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`)
+            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`, {
+                method: 'GET',
+            })
                 .then(response => {
+                    // Log the HTTP status code and response text
                     if (!response.ok) {
+                        console.error(`HTTP status code: ${response.status}`);
+                        response.text().then(text => console.error(`Response text: ${text}`));
                         throw new Error('Network response was not ok');
                     }
-                    return response.json();
+                    else {
+                        return response.json();
+                    }   
                 })
                 .then(data => {
                     // Handle response data accordingly
-                    var typeOfFurnitures = data.typeOfFurnitures;
+                    var typeOfFurnitures = data;
                     // Clear the select options
                     $('#typeOfSelenSelect').empty();
 
                     // Populate the select options with typeOfSelen enums
                     if (typeOfFurnitures.length === 0) {
                         $('#typeOfSelenSelect').append(`<option value="0">No Selected</option>`);
-                        alert(`For this category have not the typeOfFurnitures !`)
+                        alert(`There is not available TypeOfSelen for this category in the database !`)
                         $('#myBtn').show();
                     } else {
                         $('#myBtn').hide();
@@ -145,7 +183,7 @@
                     }
                 })
                 .catch(error => {
-                    alert('There was a problem with your fetch operation:', error);
+                    alert('Error: ' + error.message);
                 });
         };
     </script>

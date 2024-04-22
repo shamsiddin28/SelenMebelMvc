@@ -154,8 +154,10 @@ else if (TempData["ErrorMessage"] != null)
             var selectedValue = this.value;
 
             // Fetch request
-            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`)
-                .then(response => {S
+            fetch(`/Furniture/GetCategoryById?id=${selectedValue}`, {
+                method: 'GET',
+            })
+                .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
@@ -163,7 +165,7 @@ else if (TempData["ErrorMessage"] != null)
                 })
                 .then(data => {
                     // Handle response data accordingly
-                    var typeOfFurnitures = data.typeOfFurnitures;
+                    var typeOfFurnitures = data;
                     // Clear the select options
                     $('#typeOfSelenSelect').empty();
 
@@ -198,7 +200,7 @@ else if (TempData["ErrorMessage"] != null)
                     }
                 })
                 .catch(error => {
-                    alert('There was a problem with your fetch operation:', error);
+                    alert('Error: ' + error.message);
                 });
         };
     </script>

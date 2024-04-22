@@ -7,7 +7,7 @@ namespace SelenMebel.Data.Repositories;
 
 public class CategoryRepository : GenericRepository<Category>, ICategoryRepository
 {
-    public CategoryRepository(SelenMebelDbContext selenMebelDbContext) : base(selenMebelDbContext)
-    {
-    }
+	public CategoryRepository(SelenMebelDbContext selenMebelDbContext) : base(selenMebelDbContext)
+	{
+	}
 }

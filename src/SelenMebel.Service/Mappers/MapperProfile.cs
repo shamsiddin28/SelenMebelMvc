@@ -21,52 +21,52 @@ namespace SelenMebel.Service.Mappers;
 
 public class MapperProfile : Profile
 {
-    public MapperProfile()
-    {
-        // Category
-        CreateMap<Category, CategoryForCreationDto>().ReverseMap();
-        CreateMap<Category, CategoryForUpdateDto>().ReverseMap();
-        CreateMap<Category, CategoryForResultDto>().ReverseMap();
+	public MapperProfile()
+	{
+		// Category
+		CreateMap<Category, CategoryForCreationDto>().ReverseMap();
+		CreateMap<Category, CategoryForUpdateDto>().ReverseMap();
+		CreateMap<Category, CategoryForResultDto>().ReverseMap();
 
-        // Furniture
-        CreateMap<Furniture, FurnitureForCreationDto>().ReverseMap();
-        CreateMap<Furniture, FurnitureForUpdateDto>().ReverseMap();
-        CreateMap<Furniture, FurnitureForResultDto>().ReverseMap();
+		// Furniture
+		CreateMap<Furniture, FurnitureForCreationDto>().ReverseMap();
+		CreateMap<Furniture, FurnitureForUpdateDto>().ReverseMap();
+		CreateMap<Furniture, FurnitureForResultDto>().ReverseMap();
 
-        // FurnitureFeature
-        CreateMap<FurnitureFeature, FurnitureFeatureForCreationDto>().ReverseMap();
-        CreateMap<FurnitureFeature, FurnitureFeatureForUpdateDto>().ReverseMap();
-        CreateMap<FurnitureFeature, FurnitureFeatureForResultDto>().ReverseMap();
+		// FurnitureFeature
+		CreateMap<FurnitureFeature, FurnitureFeatureForCreationDto>().ReverseMap();
+		CreateMap<FurnitureFeature, FurnitureFeatureForUpdateDto>().ReverseMap();
+		CreateMap<FurnitureFeature, FurnitureFeatureForResultDto>().ReverseMap();
 
-        // TypeOfFurniture
-        CreateMap<TypeOfFurniture, TypeOfFurnitureForCreationDto>().ReverseMap();
-        CreateMap<TypeOfFurniture, TypeOfFurnitureForUpdateDto>().ReverseMap();
-        CreateMap<TypeOfFurniture, TypeOfFurnitureForResultDto>().ReverseMap();
+		// TypeOfFurniture
+		CreateMap<TypeOfFurniture, TypeOfFurnitureForCreationDto>().ReverseMap();
+		CreateMap<TypeOfFurniture, TypeOfFurnitureForUpdateDto>().ReverseMap();
+		CreateMap<TypeOfFurniture, TypeOfFurnitureForResultDto>().ReverseMap();
 
-        // Order
-        CreateMap<Order, OrderForCreationDto>().ReverseMap();
-        CreateMap<Order, OrderForResultDto>().ReverseMap();
-        CreateMap<Order, OrderForUpdateDto>().ReverseMap();
+		// Order
+		CreateMap<Order, OrderForCreationDto>().ReverseMap();
+		CreateMap<Order, OrderForResultDto>().ReverseMap();
+		CreateMap<Order, OrderForUpdateDto>().ReverseMap();
 
-        // OrderDetail
-        CreateMap<OrderDetail, OrderDetailForCreationDto>().ReverseMap();
-        CreateMap<OrderDetail, OrderDetailForResultDto>().ReverseMap();
-        CreateMap<OrderDetail, OrderDetailForUpdateDto>().ReverseMap();
+		// OrderDetail
+		CreateMap<OrderDetail, OrderDetailForCreationDto>().ReverseMap();
+		CreateMap<OrderDetail, OrderDetailForResultDto>().ReverseMap();
+		CreateMap<OrderDetail, OrderDetailForUpdateDto>().ReverseMap();
 
-        // ShoppingCart
-        CreateMap<ShoppingCart, ShoppingCartForCreationDto>().ReverseMap();
-        CreateMap<ShoppingCart, ShoppingCartForUpdateDto>().ReverseMap();
-        CreateMap<ShoppingCart, ShoppingCartForResultDto>().ReverseMap();
+		// ShoppingCart
+		CreateMap<ShoppingCart, ShoppingCartForCreationDto>().ReverseMap();
+		CreateMap<ShoppingCart, ShoppingCartForUpdateDto>().ReverseMap();
+		CreateMap<ShoppingCart, ShoppingCartForResultDto>().ReverseMap();
 
-        // CartDetail
-        CreateMap<CartDetail, CartDetailForCreationDto>().ReverseMap();
-        CreateMap<CartDetail, CartDetailForResultDto>().ReverseMap();
-        CreateMap<CartDetail, CartDetailForUpdateDto>().ReverseMap();
+		// CartDetail
+		CreateMap<CartDetail, CartDetailForCreationDto>().ReverseMap();
+		CreateMap<CartDetail, CartDetailForResultDto>().ReverseMap();
+		CreateMap<CartDetail, CartDetailForUpdateDto>().ReverseMap();
 
-        CreateMap<AdminRegisterDto, Admin>().ReverseMap();
-        CreateMap<UserBaseViewModel, User>().ReverseMap();
-        CreateMap<UserViewModel, User>().ReverseMap();
-        CreateMap<UserRegisterDto, User>().ReverseMap();
+		CreateMap<AdminRegisterDto, Admin>().ReverseMap();
+		CreateMap<UserBaseViewModel, User>().ReverseMap();
+		CreateMap<UserViewModel, User>().ReverseMap();
+		CreateMap<UserRegisterDto, User>().ReverseMap();
 
-    }
+	}
 }

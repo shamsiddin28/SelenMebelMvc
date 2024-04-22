@@ -8,11 +8,11 @@ namespace SelenMebel.Domain.Entities.Categories;
 [Table("Category")]
 public class Category : Auditable
 {
-    [MaxLength(40)]
-    public string Name { get; set; }
+	[MaxLength(40)]
+	public string Name { get; set; }
 
-    [Required]
-    public string Image { get; set; }
+	[Required]
+	public string Image { get; set; }
 
-    public ICollection<TypeOfFurniture> TypeOfFurnitures { get; set; }
+	public ICollection<TypeOfFurniture> TypeOfFurnitures { get; set; }
 }

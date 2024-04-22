@@ -26,42 +26,42 @@ namespace SelenMebel.Api.Extensions;
 
 public static class ServiceExtension
 {
-    public static void AddCustomService(this IServiceCollection services)
-    {
-        // Furniture
-        services.AddScoped<IFurnitureRepository, FurnitureRepository>();
-        services.AddScoped<IFurnitureService, FurnitureService>();
+	public static void AddCustomService(this IServiceCollection services)
+	{
+		// Furniture
+		services.AddScoped<IFurnitureRepository, FurnitureRepository>();
+		services.AddScoped<IFurnitureService, FurnitureService>();
 
-        // TypeOfFurniture
-        services.AddScoped<ITypeOfFurnitureRepository, TypeOfFurnitureRepository>();
-        services.AddScoped<ITypeOfFurnitureService, TypeOfFurnitureService>();
+		// TypeOfFurniture
+		services.AddScoped<ITypeOfFurnitureRepository, TypeOfFurnitureRepository>();
+		services.AddScoped<ITypeOfFurnitureService, TypeOfFurnitureService>();
 
-        // Category
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<ICategoryService, CategoryService>();
+		// Category
+		services.AddScoped<ICategoryRepository, CategoryRepository>();
+		services.AddScoped<ICategoryService, CategoryService>();
 
-        // FurnitureFeature
-        services.AddScoped<IFurnitureFeatureRepository, FurnitureFeatureRepository>();
-        services.AddScoped<IFurnitureFeatureService, FurnitureFeatureService>();
+		// FurnitureFeature
+		services.AddScoped<IFurnitureFeatureRepository, FurnitureFeatureRepository>();
+		services.AddScoped<IFurnitureFeatureService, FurnitureFeatureService>();
 
-        // Admins 
-        services.AddScoped<IAdminRepository, AdminRepository>();
-        services.AddScoped<IAdminService, AdminService>();
+		// Admins 
+		services.AddScoped<IAdminRepository, AdminRepository>();
+		services.AddScoped<IAdminService, AdminService>();
 
-        // Users
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IUserService, UserService>();
+		// Users
+		services.AddScoped<IUserRepository, UserRepository>();
+		services.AddScoped<IUserService, UserService>();
 
-        services.AddScoped<IIdentityService, IdentityService>();
-        services.AddScoped<IAccountService, AccountService>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IImageService, ImageService>();
-        services.AddScoped<IFileService, FileService>();
+		services.AddScoped<IIdentityService, IdentityService>();
+		services.AddScoped<IAccountService, AccountService>();
+		services.AddScoped<IUnitOfWork, UnitOfWork>();
+		services.AddScoped<IAuthService, AuthService>();
+		services.AddScoped<IImageService, ImageService>();
+		services.AddScoped<IFileService, FileService>();
 
 
-        services.AddMemoryCache();
-        services.AddHttpContextAccessor();
-        services.AddAutoMapper(typeof(MapperProfile));
-    }
+		services.AddMemoryCache();
+		services.AddHttpContextAccessor();
+		services.AddAutoMapper(typeof(MapperProfile));
+	}
 }
