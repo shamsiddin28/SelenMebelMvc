@@ -2,11 +2,11 @@
 
 public class NotFoundException : Exception
 {
-	public string Point { get; set; } = string.Empty;
+    public string Point { get; set; } = string.Empty;
 
-	public NotFoundException(string point, string message)
-		: base(message)
-	{
-		this.Point = point;
-	}
+    public NotFoundException(string point, string message)
+        : base(message)
+    {
+        this.Point = point;
+    }
 }

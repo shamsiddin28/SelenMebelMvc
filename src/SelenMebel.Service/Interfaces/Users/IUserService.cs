@@ -6,24 +6,24 @@ using SelenMebel.Service.ViewModels.UserViewModels;
 
 namespace SelenMebel.Service.Interfaces.Users
 {
-	public interface IUserService
-	{
-		Task<bool> DeleteAsync(long id);
+    public interface IUserService
+    {
+        Task<bool> DeleteAsync(long id);
 
-		Task<bool> DeleteImageAsync(long id);
+        Task<bool> DeleteImageAsync(long id);
 
-		Task<UserViewModel> GetByTokenAsync();
+        Task<UserViewModel> GetByTokenAsync();
 
-		Task<UserViewModel> GetByIdAsync(long id);
+        Task<UserViewModel> GetByIdAsync(long id);
 
-		Task<bool> UpdateImageAsync(long id, IFormFile file);
+        Task<bool> UpdateImageAsync(long id, IFormFile file);
 
-		Task<string> LoginAsync(AccountLoginDto accountLoginDto);
+        Task<string> LoginAsync(AccountLoginDto accountLoginDto);
 
-		Task<bool> UpdateAsync(long id, UserUpdateDto userUpdateDto);
+        Task<bool> UpdateAsync(long id, UserUpdateDto userUpdateDto);
 
-		Task<bool> UserRegisterAsync(UserRegisterDto userRegisterDto);
+        Task<bool> UserRegisterAsync(UserRegisterDto userRegisterDto);
 
-		Task<bool> UpdatePasswordAsync(long id, PasswordUpdateDto dto);
-	}
+        Task<bool> UpdatePasswordAsync(long id, PasswordUpdateDto dto);
+    }
 }

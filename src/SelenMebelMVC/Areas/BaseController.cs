@@ -2,10 +2,10 @@
 
 namespace SelenMebelMVC.Areas
 {
-	[ApiController]
-	[Route("api/[controller]/")]
-	public class BaseController : ControllerBase
-	{
+    [ApiController]
+    [Route("api/[controller]/")]
+    public class BaseController : ControllerBase
+    {
 
-	}
+    }
 }

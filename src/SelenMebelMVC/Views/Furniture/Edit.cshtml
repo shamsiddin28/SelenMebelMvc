@@ -33,12 +33,19 @@
                 <div class="col-sm-8">
                     <select id="mySelect" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container">
                         @{
-                            var categoryy = ViewBag.Category;
                             var categories = ViewBag.Categories;
-                            <option value="@categoryy.Id.ToString()">@categoryy.Name.ToString()</option>
+                            var selectedCategoryId = ViewBag.SelectedCategoryId; // Assuming you have the selected category ID available in ViewBag
+
                             foreach (var category in categories)
                             {
-                                <option value="@category.Id.ToString()">@category.Name.ToString()</option>
+                                if (category.Id == selectedCategoryId)
+                                {
+                                    <option value="@category.Id.ToString()" selected>@category.Name.ToString()</option>
+                                }
+                                else
+                                {
+                                    <option value="@category.Id.ToString()">@category.Name.ToString()</option>
+                                }
                             }
                         }
                     </select>
@@ -49,27 +56,19 @@
                 <div class="col-sm-8">
                     <select asp-for="TypeOfFurnitureId" id="typeOfSelenSelect" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container" required>
                         @{
-                            var typeOf = ViewBag.TypeOfFurniture;
-                            var optionText = "";
-                            @switch ((int)typeOf.TypeOfSelen)
+                            var typeOfFurnitures = ViewBag.TypeOfFurnitures;
+                            var selectedTypeOfSelen = ViewBag.SelectedTypeOfSelen;
+                            foreach (var typeOf in typeOfFurnitures)
                             {
-                                case 1:
-                                    optionText = "HiTech";
-                                    break;
-                                case 2:
-                                    optionText = "Classic";
-                                    break;
-                                case 3:
-                                    optionText = "Royal";
-                                    break;
-                                case 4:
-                                    optionText = "None";
-                                    break;
-                                default:
-                                    optionText = "Unknown";
-                                    break;
+                                if (typeOf.TypeOfSelen == selectedTypeOfSelen)
+                                {
+                                    <option value="@typeOf.Id" selected>@typeOf.TypeOfSelen.ToString()</option>
+                                }
+                                else
+                                {
+                                    <option value="@typeOf.Id">@typeOf.TypeOfSelen.ToString()</option>
+                                }
                             }
-                            <option value="@typeOf.Id">@optionText</option>
                         }
                     </select>
                 </div>
@@ -206,7 +205,7 @@
                                     optionText = 'Unknown';
                             }
                             $('#typeOfSelenSelect').append(`<option value="${typeOfFurnitureId}">${optionText}</option>`);
-                            console.log(typeOfFurnitureId, optionText)
+                            //console.log(typeOfFurnitureId, optionText)
                         });
                     }
                 })

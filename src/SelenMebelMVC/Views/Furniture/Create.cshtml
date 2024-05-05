@@ -59,7 +59,7 @@ else if (TempData["ErrorMessage"] != null)
                             var categories = ViewBag.Categories;
                             foreach (var category in categories)
                             {
-                                        <option value="@category.Id.ToString()">@category.Name.ToString()</option>
+                                <option value="@category.Id.ToString()">@category.Name.ToString()</option>
                             }
                         }
                     </select>

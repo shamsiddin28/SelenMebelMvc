@@ -4,7 +4,7 @@ namespace SelenMebel.Service.Interfaces.Files;
 
 public interface IFileService
 {
-	Task<string> UploadImageAsync(IFormFile image);
-	Task<bool> DeleteImageAsync(string imagePartPath);
-	Task<byte[]> DownloadAsync(string imagePartPath);
+    Task<string> UploadImageAsync(IFormFile image);
+    Task<bool> DeleteImageAsync(string imagePartPath);
+    Task<byte[]> DownloadAsync(string imagePartPath);
 }

@@ -7,24 +7,24 @@ namespace SelenMebel.Service.DTOs.TypeOfFurnitures;
 
 public class TypeOfFurnitureForUpdateDto
 {
-	[Required(ErrorMessage = "PLease enter the TypeOfSelen!")]
-	public TypeOfSelen TypeOfSelen { get; set; }
+    [Required(ErrorMessage = "Please enter the TypeOfSelen!")]
+    public TypeOfSelen TypeOfSelen { get; set; }
 
-	[Required(ErrorMessage = "Please upload the image of category!")]
-	public IFormFile Image { get; set; }
+    [Required(ErrorMessage = "Please upload the image of category!")]
+    public IFormFile Image { get; set; }
 
-	[Required(ErrorMessage = "Please enter the CategoryId!")]
-	public long CategoryId { get; set; }
+    [Required(ErrorMessage = "Please enter the CategoryId!")]
+    public long CategoryId { get; set; }
 
-	public string ImagePath { get; set; } = string.Empty;
+    public string ImagePath { get; set; } = string.Empty;
 
-	public static implicit operator TypeOfFurniture(TypeOfFurnitureForUpdateDto dto)
-	{
-		return new TypeOfFurniture()
-		{
-			TypeOfSelen = dto.TypeOfSelen,
-			Image = dto.ImagePath,
-			CategoryId = dto.CategoryId,
-		};
-	}
+    public static implicit operator TypeOfFurniture(TypeOfFurnitureForUpdateDto dto)
+    {
+        return new TypeOfFurniture()
+        {
+            TypeOfSelen = dto.TypeOfSelen,
+            Image = dto.ImagePath,
+            CategoryId = dto.CategoryId,
+        };
+    }
 }

@@ -50,9 +50,7 @@ else if (TempData["ErrorMessage"] != null)
                 <div class="col-sm-8">
                     <select id="mySelect" asp-for="CategoryId" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container" required>
                         @{
-                            var categoryy = ViewBag.Category;
                             var categories = ViewBag.Categories;
-                            <option value="@categoryy.Id.ToString()">@categoryy.Name.ToString()</option>
                             foreach (var category in categories)
                             {
                                 <option value="@category.Id.ToString()">@category.Name.ToString()</option>
@@ -66,27 +64,11 @@ else if (TempData["ErrorMessage"] != null)
                 <div class="col-sm-8">
                     <select id="typeOfSelenSelect" class="form-select form-select-solid fv-row mb-7 fv-plugins-icon-container">
                         @{
-                            var typeOf = ViewBag.TypeOfFurniture;
-                            var optionText = "";
-                            @switch ((int)typeOf.TypeOfSelen)
+                            var typeOf = ViewBag.TypeOfFurnitures;
+                            foreach (var item in typeOf)
                             {
-                                case 1:
-                                    optionText = "HiTech";
-                                    break;
-                                case 2:
-                                    optionText = "Classic";
-                                    break;
-                                case 3:
-                                    optionText = "Royal";
-                                    break;
-                                case 4:
-                                    optionText = "None";
-                                    break;
-                                default:
-                                    optionText = "Unknown";
-                                    break;
+                                <option value="@item.Id">@item.TypeOfSelen.ToString()</option>
                             }
-                            <option value="@typeOf.Id">@optionText</option>
                         }
                     </select>
                 </div>

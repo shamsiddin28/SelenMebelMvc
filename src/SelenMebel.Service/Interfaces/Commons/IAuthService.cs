@@ -4,5 +4,5 @@ namespace SelenMebel.Service.Interfaces.Commons;
 
 public interface IAuthService
 {
-	string GenerateToken(Human human, string role);
+    string GenerateToken(Human human, string role);
 }
