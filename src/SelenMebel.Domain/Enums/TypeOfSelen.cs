@@ -1,10 +1,20 @@
-﻿namespace SelenMebel.Domain.Enums
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SelenMebel.Domain.Enums
 {
     public enum TypeOfSelen
     {
-        None = 0,
-        HI_TECH = 1,
-        CLASSIC = 2,
-        ROYAL = 3,
+
+        [Display(Name = "HiTech")]
+        HiTech = 1,
+
+        [Display(Name = "Classic")]
+        Classic = 2,
+
+        [Display(Name = "Royal")]
+        Royal = 3,
+
+        [Display(Name = "None")]
+        None = 4,
     }
 }

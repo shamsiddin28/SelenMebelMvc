@@ -1,0 +1,225 @@
+﻿@model IEnumerable<SelenMebel.Service.DTOs.Furnitures.FurnitureForResultDto>
+@{
+    ViewData["Title"] = "Furnitures";
+}
+
+<div >
+    <h3 class="text-center mb-2">@ViewData["Title"]</h3>
+
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class='alert alert-info alert-dismissible fade show' role='alert'>
+            <strong>Information ! </strong> @TempData["InfoMessage"]
+            <button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+                <span>&times;</span>
+            </button>
+        </div>
+    }
+    else if (TempData["SuccessMessage"] != null)
+    {
+        <div class='alert alert-success alert-dismissible fade show' role='alert'>
+            <strong>Success ! </strong> @TempData["SuccessMessage"]
+            <button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+                <span>&times;</span>
+            </button>
+        </div>
+    }
+    else if (TempData["ErrorMessage"] != null)
+    {
+        <div class='alert alert-danger alert-dismissible fade show' role='alert'>
+            <strong>Error ! </strong> @TempData["ErrorMessage"]
+            <button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+                <span>&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="row mb-2">
+        <div class="col">
+            <a class='btn btn-primary' asp-action="Create" asp-controller="Furniture" >Create New Furniture</a>
+        </div>
+        <div class="col">
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        @using (Html.BeginForm("Index", "Furniture", FormMethod.Get))
+        {
+            <table>
+                <tr>
+                    <td>
+                        <span><b>Search By:</b></span>
+                        @Html.RadioButton("searchBy", "UniqueId", true)
+                        <text>Unique Id</text>
+                        @Html.RadioButton("searchBy", "Price")
+                        <text>Price</text>
+                        @Html.RadioButton("searchBy", "CategoryName")
+                        <text>Category Name</text>
+                        @Html.RadioButton("searchBy", "FurnitureName")
+                        <text>Furniture Name</text>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.TextBox("searchValue", null, new { Class = "form-control", placeholder = "Enter Furniture or Category Name or UniqueId or Price" })
+                    </td>
+                    <td>
+                        &nbsp;
+                    </td>
+                    <td>
+                        <input type="submit" value="Search" class="btn btn-success" />
+                    </td>
+                </tr>
+            </table>
+        }
+    </div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            @{
+                var pageIndex = ViewData["PageIndex"] != null ? (int)ViewData["PageIndex"] : 1;
+                var pageSize = ViewData["PageSize"] != null ? (int)ViewData["PageSize"] : 10;
+                var totalItems = ViewData["TotalItems"] != null ? ViewData["TotalItems"] : 1;
+                var totalPages = ViewData["TotalItems"] != null ? (int)Math.Ceiling((int)totalItems / (double)pageSize) : 1;
+
+                var searchBy = ViewData["SearchBy"];
+                var searchValue = ViewData["SearchValue"];
+            }
+
+            @if (totalPages > 1)
+            {
+                <li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?pageIndex=1&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">First</a>
+                </li>
+                <li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?pageIndex=@(pageIndex - 1)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Previous</a>
+                </li>
+
+                @for (var i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(pageIndex == i ? "active" : "")" aria-current="page">
+                        <a class="page-link" href="?pageIndex=@(i)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?pageIndex=@(pageIndex + 1)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Next</a>
+                </li>
+                <li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?pageIndex=@totalPages&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Last</a>
+                </li>
+            }
+        </ul>
+    </nav>
+    <div style="height: 400px; overflow-y: auto;">
+        <table class="table table-bordered table-responsive table-hover" >
+            <thead class="table-active">
+                <tr>
+                <th style="cursor: pointer;" onclick="sortTable('Id')">
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th style="cursor: pointer;" onclick="sortTable('Category')">
+                    @Html.DisplayNameFor(model => model.TypeOfFurniture.Category)
+                </th>
+                <th style="cursor: pointer;" onclick="sortTable('TypeOfSelen')">
+                    @Html.DisplayNameFor(model => model.TypeOfFurniture.TypeOfSelen)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Image)
+                </th>
+                <th style="cursor: pointer;" onclick="sortTable('Description')">
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th style="cursor: pointer;" onclick="sortTable('UniqueId')">
+                    @Html.DisplayNameFor(model => model.UniqueId)
+                </th>
+                <th style="cursor: pointer;" onclick="sortTable('Price')">
+                    @Html.DisplayNameFor(model => model.Price)
+                </th>
+                <th style="cursor: pointer;" onclick="sortTable('CreatedAt')">
+                    @Html.DisplayNameFor(model => model.CreatedAt)
+                </th>
+                <th style="cursor: pointer;" onclick="sortTable('UpdatedAt')">
+                    @Html.DisplayNameFor(model => model.UpdatedAt)
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+        </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var furniture in Model)
+                    {
+                        <tr>
+                            @if (!string.IsNullOrEmpty(furniture.Name))
+                            {
+                                <td>
+                                    @Html.DisplayFor(model => furniture.Name)
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <span style="color: red;">Name has no value !</span>
+                                </td>
+                            }
+                            <td>
+                                @Html.DisplayFor(model => furniture.TypeOfFurniture.Category.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => furniture.TypeOfFurniture.TypeOfSelen)
+                            </td>
+                            <td>
+                                <img src="~/@furniture.Image" alt="" width=150 />
+                            </td>
+                            @if (!string.IsNullOrEmpty(furniture.Description))
+                            {
+                                <td>
+                                    @Html.DisplayFor(model => furniture.Description)
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <span style="color: red;">Description has no value !</span>
+                                </td>
+                            }
+                            <td>
+                                @Html.DisplayFor(model => furniture.UniqueId)
+                            </td>
+                            <td>
+                                @(Html.DisplayFor(model => furniture.Price))$
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => furniture.CreatedAt)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => furniture.UpdatedAt)
+                            </td>
+                            <td style="white-space:nowrap">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Edit" asp-route-id="@furniture.Id" class="btn btn-primary btn-sm">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@furniture.Id" class="btn btn-danger btn-sm">Delete</a>
+                                    <a asp-action="Details" asp-route-id="@furniture.Id" class="btn btn-primary btn-sm">Details</a>
+                                    <a asp-action="Create" asp-controller="FurnitureFeature" asp-route-id="@furniture.Id" class="btn btn-success btn-sm">AddFeature</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+            {
+                <tr>
+                    <td colspan="8">
+                        <div>
+                            Furnitures not available in the database
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+

@@ -1,0 +1,265 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SelenMebelWebAPI</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SelenMebelMVC.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SerenMebel</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <div class="dropdown" id="navbarNavDarkDropdown">
+                            <ul class="navbar-nav">
+                                <li class="nav-item dropdown">
+                                    <button class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Category
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-primary">
+                                        <li><a class="dropdown-item" asp-controller="Category" asp-action="Create">New</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Category" asp-action="Index">Edit</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Category" asp-action="Index">Categories</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown" id="navbarNavDarkDropdown">
+                            <ul class="navbar-nav">
+                                <li class="nav-item dropdown">
+                                    <button class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        TypeOfFurniture
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-primary">
+                                        <li><a class="dropdown-item" asp-controller="TypeOfFurniture" asp-action="Create">New</a></li>
+                                        <li><a class="dropdown-item" asp-controller="TypeOfFurniture" asp-action="Index">Edit</a></li>
+                                        <li><a class="dropdown-item" asp-controller="TypeOfFurniture" asp-action="Index">TypeOfFurnitures</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown" id="navbarNavDarkDropdown">
+                            <ul class="navbar-nav">
+                                <li class="nav-item dropdown">
+                                    <button class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Furniture
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-primary">
+                                        <li><a class="dropdown-item" asp-controller="Furniture" asp-action="Create">New</a></li>
+                                        <li><a class="dropdown-item" id="editFurniture">Edit</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Furniture" asp-action="Index">Furnitures</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown" id="navbarNavDarkDropdown">
+                            <ul class="navbar-nav">
+                                <li class="nav-item dropdown">
+                                    <button class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        FurnitureFeature
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-primary">
+                                        <li><a class="dropdown-item" id="createFeatureBtn">New</a></li>
+                                        <li><a class="dropdown-item" id="detailsFurniture">Edit</a></li>
+                                        <li><a class="dropdown-item" asp-controller="FurnitureFeature" asp-action="Index">FurnitureFeatures</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </ul>
+                    
+                    <div class="dropdown" id="navbarNavDarkDropdown">
+                        <ul class="navbar-nav">
+                            <li class="nav-item dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Control Furnitures
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-primary">
+                                    <li><a class="dropdown-item" href="/Furniture/Index">All Furnitures</a></li>
+                                    <li><a class="dropdown-item" href="/Furniture/Create">New Furniture</a></li>
+                                    <li><a class="dropdown-item" href="/Category/Create">New Category</a></li>
+                                    <li><a class="dropdown-item" href="/TypeOfFurniture/Create">New TypeOfFurniture</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="dropdown" id="navbarNavDarkDropdown">
+                        <ul class="navbar-nav">
+                            <li class="nav-item dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Profile
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-primary">
+                                    <li><a class="dropdown-item" asp-controller="Admins" asp-action="Profile">My Profile</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Accounts" asp-action="Register">New Admin</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Admins" asp-action="Index">All Admins</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Accounts" asp-action="Register">SignUp</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-controller="Accounts" asp-action="LogOut">LogOut</a>
+                    </li>
+                </ul>
+            </div>
+            <style>
+                /* Show dropdown menu when hovering over the dropdown button */
+                .dropdown:hover .dropdown-menu {
+                    display: block;
+                }
+            </style>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            
+            @if (ViewBag.Message is not null)
+            {
+                <div class="alert alert-success">
+                    <b>Success : </b>@ViewBag.Message
+                    <button type="button" class="btn-close float-end" 
+                        data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - SelenMebelMVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/js/customjs.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        // Add click event listener to the button
+        document.getElementById("createFeatureBtn").addEventListener("click", function () {
+            // Get input value from the user
+            var inputValue = prompt("Please enter the Furniture UniqueId:");
+
+            // Make sure user entered a value
+            if (inputValue !== null) {
+                // Send AJAX request to the controller action
+                fetch(`/FurnitureFeature/GetByFurnitureUniqueId?uniqueId=${inputValue}`, {
+                    method: 'GET', // Assuming you want to send a GET request
+                })
+                    .then(response => {
+                        // Check if the response is successful
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        // Parse response as JSON
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Extract the id from the response
+                        var id = data;
+
+                        // Redirect to the Create/Furniturefeature URL with the id as a query parameter
+                        window.location.href = `/FurnitureFeature/Create?id=${id}`;
+                    })
+                    .catch(error => {
+                        // Handle any errors that occurred during the fetch operation
+                        console.error('There was a problem with your fetch operation:', error);
+                    });
+            }
+        });
+    </script>
+
+    <script>
+        // Add click event listener to the button
+        document.getElementById("editFurniture").addEventListener("click", function () {
+            // Get input value from the user
+            var inputValue = prompt("Please enter the Furniture UniqueId:");
+
+            // Make sure user entered a value
+            if (inputValue !== null) {
+                // Send AJAX request to the controller action
+                fetch(`/Furniture/GetByUniqueId?uniqueId=${inputValue}`, {
+                    method: 'GET', // Assuming you want to send a GET request
+                })
+                    .then(response => {
+                        // Check if the response is successful
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        // Parse response as JSON
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Extract the id from the response
+                        var id = data;
+
+                        // Redirect to the Create/Furniturefeature URL with the id as a query parameter
+                        window.location.href = `/Furniture/Edit/${id}`;
+                    })
+                    .catch(error => {
+                        // Handle any errors that occurred during the fetch operation
+                        console.error('There was a problem with your fetch operation:', error);
+                    });
+                    
+            }
+        });
+    </script>
+
+    <script>
+        // Add click event listener to the button
+        document.getElementById("detailsFurniture").addEventListener("click", function () {
+            // Get input value from the user
+            var inputValue = prompt("Please enter the Furniture UniqueId:");
+
+            // Make sure user entered a value
+            if (inputValue !== null) {
+                // Send AJAX request to the controller action
+                fetch(`/Furniture/GetByUniqueId?uniqueId=${inputValue}`, {
+                    method: 'GET', // Assuming you want to send a GET request
+                })
+                    .then(response => {
+                        // Check if the response is successful
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        // Parse response as JSON
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Extract the id from the response
+                        var id = data;
+
+                        // Redirect to the Create/Furniturefeature URL with the id as a query parameter
+                        window.location.href = `/Furniture/Details?id=${id}`;
+                    })
+                    .catch(error => {
+                        // Handle any errors that occurred during the fetch operation
+                        console.error('There was a problem with your fetch operation:', error);
+                    });
+            }
+        });
+    </script>
+</body>
+</html>

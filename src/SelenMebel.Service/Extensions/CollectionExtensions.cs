@@ -9,7 +9,7 @@ namespace SelenMebel.Service.Extensions;
 public static class CollectionExtensions
 {
     public static IQueryable<TEntity> ToPagedList<TEntity>(this IQueryable<TEntity> source, PaginationParams @params)
-            where TEntity : Auditable
+            where TEntity : BaseEntity
     {
 
         var metaData = new PaginationMetaData(source.Count(), @params);
@@ -21,6 +21,10 @@ public static class CollectionExtensions
                 HttpContextHelper.ResponseHeaders.Remove("X-Pagination");
 
             HttpContextHelper.ResponseHeaders.Add("X-Pagination", json);
+
+            // Add X-Total-Count header to the response headers
+            HttpContextHelper.ResponseHeaders.Add("X-Total-Count", metaData.TotalCount.ToString());
+
         }
 
         return @params.PageIndex > 0 && @params.PageSize > 0 ?

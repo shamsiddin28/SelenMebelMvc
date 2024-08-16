@@ -1,35 +1,45 @@
-﻿namespace SelenMebel.Api.Controllers.Caregories
-{
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SelenMebel.Domain.Configurations;
+using SelenMebel.Service.DTOs.Categories;
+using SelenMebel.Service.Interfaces.Categories;
 
+namespace SelenMebel.Api.Controllers.Caregories
+{
     public class CategoriesController : BaseController
     {
-        //private readonly ICategoryService _categoryService;
+        private readonly ICategoryService _categoryService;
 
-        //public CategoriesController(ICategoryService categoryService)
-        //{
-        //    _categoryService = categoryService;
-        //}
+        public CategoriesController(ICategoryService categoryService)
+        {
+            _categoryService = categoryService;
+        }
 
-        //[HttpPost]
-        //public async Task<IActionResult> PostAsync([FromForm] CategoryForCreationDto dto)
-        //=> Ok(await this._categoryService.CreateAsync(dto));
+        [HttpPost]
+        [Authorize(Roles = "admin, superadmin")]
+        public async Task<IActionResult> PostAsync([FromForm] CategoryForCreationDto dto)
+            => Ok(await _categoryService.CreateAsync(dto));
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllAsync([FromQuery] PaginationParams @params)
-        //    => Ok(await this._categoryService.RetrieveAllAsync(@params));
+        [HttpGet("ByPagination")]
+        public async Task<IActionResult> GetAllAsync([FromQuery] PaginationParams @params)
+            => Ok(await _categoryService.RetrieveAllAsync(@params));
 
-        //[HttpGet("{id}")]
-        //public async Task<IActionResult> GetAsync([FromRoute(Name = "id")] long id)
-        //    => Ok(await this._categoryService.RetrieveByIdAsync(id));
+        [HttpGet]
+        public async Task<IActionResult> GetAllAsync()
+            => Ok(await _categoryService.RetrieveAllCategoriesAsync());
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync([FromRoute(Name = "id")] long id)
+            => Ok(await _categoryService.RetrieveByIdAsync(id));
 
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteAsync([FromRoute(Name = "id")] long id)
-        //    => Ok(await this._categoryService.RemoveAsync(id));
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "admin, superadmin")]
+        public async Task<IActionResult> DeleteAsync([FromRoute(Name = "id")] long id)
+            => Ok(await _categoryService.RemoveAsync(id));
 
-
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutAsync([FromRoute(Name = "id")] long id, [FromForm] CategoryForUpdateDto dto)
-        //    => Ok(await this._categoryService.ModifyAsync(id, dto));
+        [HttpPut("{id}")]
+        [Authorize(Roles = "admin, superadmin")]
+        public async Task<IActionResult> PutAsync([FromRoute(Name = "id")] long id, [FromForm] CategoryForUpdateDto dto)
+            => Ok(await _categoryService.ModifyAsync(id, dto));
     }
 }

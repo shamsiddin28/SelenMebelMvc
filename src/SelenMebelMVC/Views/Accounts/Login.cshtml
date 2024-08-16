@@ -1,0 +1,145 @@
+﻿@using SelenMebel.Service.DTOs.Accounts;
+@model AccountLoginDto
+@{
+    Layout = "_AccountLayout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        <link rel="preconnect" href="https://fonts.googleapis.com" >
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin >
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet" >
+        /* Define a class with Poppins extra-light */
+        .poppins-extralight {
+            font-family: "Poppins", sans-serif;
+            font-weight: 200;
+            font-style: normal;
+        }
+        body {
+            font-family: "Poppins", sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #f4f4f4; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+        }
+
+            .login-container h2 {
+                text-align: center;
+                margin-bottom: 30px;
+                color: #333;
+            }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                font-weight: bold;
+                margin-bottom: 5px;
+                color: #555;
+            }
+
+            .form-group input[type="text"],
+            .form-group input[type="password"] {
+                width: 100%;
+                padding: 12px 40px 12px 12px; /* Adjusting padding for the button */
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+        .show-password-button {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .form-group input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .form-group input[type="submit"]:hover {
+                background-color: #0056b3;
+            }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+            color: #777;
+        }
+
+            .forgot-password a {
+                color: #777;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Login</h2>
+        <form asp-action="Login" asp-controller="Accounts" method="post">
+            <div class="form-group">
+                <label for="PhoneNumber">Phone Number:</label>
+                <input type="text" id="phoneNumber" name="PhoneNumber" placeholder="+998971234567" required>
+            </div>
+            <div class="form-group">
+                <label for="Password">Password:</label>
+                <input type="password" name="Password" id="inputPassword" required>
+                <button type="button" class="show-password-button" id="togglePassword">&#128065;</button>
+                <small class="form-text text-muted">
+                    <a href="https://t.me/verificationserenmebel_bot" class="forgot-password">Forgot password?</a>
+                </small>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Login">
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            var passwordInput = document.getElementById('inputPassword');
+            var button = this;
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                button.innerHTML = '&#128064;'; // Eye icon to hide password
+            } else {
+                passwordInput.type = "password";
+                button.innerHTML = '&#128065;'; // Eye slash icon to show password
+            }
+        });
+    </script>
+
+</body>
+</html>
+
+

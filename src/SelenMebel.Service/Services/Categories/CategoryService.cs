@@ -1,106 +1,159 @@
-﻿namespace SelenMebel.Service.Services.Categories;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using SelenMebel.Data.Interfaces.IRepositories;
+using SelenMebel.Domain.Configurations;
+using SelenMebel.Domain.Entities.Categories;
+using SelenMebel.Service.DTOs.Categories;
+using SelenMebel.Service.Exceptions;
+using SelenMebel.Service.Extensions;
+using SelenMebel.Service.Helpers;
+using SelenMebel.Service.Interfaces.Categories;
 
-public class CategoryService
+namespace SelenMebel.Service.Services.Categories;
+
+public class CategoryService : ICategoryService
 {
-    //private readonly IMapper _mapper;
-    //private readonly IRepository<Category> _repository;
+    private readonly IMapper _mapper;
+    private readonly string CATEGORY_FOLDER;
+    private readonly string RESOUCE_IMAGE_FOLDER;
+    private readonly ICategoryRepository _repository;
+    private readonly IHostingEnvironment _hostingEnvironment;
 
-    //public CategoryService(IMapper mapper, IRepository<Category> repository)
-    //{
-    //    _mapper = mapper;
-    //    _repository = repository;
-    //}
+    public CategoryService(
+        IMapper mapper,
+        ICategoryRepository repository,
+        IHostingEnvironment hostingEnvironment)
+    {
+        _mapper = mapper;
+        _repository = repository;
+        CATEGORY_FOLDER = "CategoryImages";
+        _hostingEnvironment = hostingEnvironment;
+        RESOUCE_IMAGE_FOLDER = Path.Combine(CATEGORY_FOLDER, "Images");
+    }
 
 
-    //public async Task<CategoryForResultDto> CreateAsync(CategoryForCreationDto dto)
-    //{
-    //    var category = await _repository.SelectAll()
-    //        .Where(c => c.Name.ToLower() == dto.Name.ToLower())
-    //        .AsNoTracking()
-    //        .FirstOrDefaultAsync();
+    public async Task<CategoryForResultDto> CreateAsync(CategoryForCreationDto dto)
+    {
+        var category = await _repository.SelectAll()
+            .Where(c => c.Name.ToLower() == dto.Name.ToLower())
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
 
-    //    if (category is not null)
-    //        throw new SelenMebelException(409, "Category is already exist");
+        if (category is not null)
+            throw new SelenMebelException(409, "Category is already exist !");
 
-    //    var image = await MediaHelper.UploadFile(dto.Image, "CategoryImages");
+        var image = await MediaHelper.UploadFile(dto.Image, _hostingEnvironment.WebRootPath, RESOUCE_IMAGE_FOLDER);
 
-    //    var mappedCategory = _mapper.Map<Category>(dto);
-    //    mappedCategory.CreatedAt = DateTime.UtcNow;
-    //    mappedCategory.Image = image;
+        var mappedCategory = _mapper.Map<Category>(dto);
+        mappedCategory.CreatedAt = DateTime.UtcNow.AddHours(5);
+        mappedCategory.Image = image;
 
-    //    var result = await _repository.InsertAsync(mappedCategory);
+        var result = await _repository.InsertAsync(mappedCategory);
 
-    //    return this._mapper.Map<CategoryForResultDto>(result);
-    //}
+        return this._mapper.Map<CategoryForResultDto>(result);
+    }
 
-    //public async Task<CategoryForResultDto> ModifyAsync(long id, CategoryForUpdateDto dto)
-    //{
-    //    var category = await _repository.SelectAll()
-    //            .Where(ud => ud.Id == id)
-    //            .AsNoTracking()
-    //            .FirstOrDefaultAsync();
+    public async Task<CategoryForResultDto> ModifyAsync(long id, CategoryForUpdateDto dto)
+    {
+        var category = await _repository.SelectAll()
+                .Where(ud => ud.Id == id)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
 
-    //    if (category is null)
-    //        throw new SelenMebelException(404, "Category is not found");
+        if (category is null)
+            throw new SelenMebelException(404, "Category is not found !");
 
-    //    var image = await MediaHelper.UploadFile(dto.Image, "CategoryImages");
+        var image = await MediaHelper.UploadFile(dto.Image, _hostingEnvironment.WebRootPath, RESOUCE_IMAGE_FOLDER);
 
-    //    var mappedCategory = this._mapper.Map(dto, category);
-    //    mappedCategory.UpdatedAt = DateTime.UtcNow;
-    //    mappedCategory.Image = image;
+        var imageFullPath = Path.Combine(_hostingEnvironment.WebRootPath, category.Image);
 
-    //    var result = await this._repository.UpdateAsync(mappedCategory);
+        if (File.Exists(imageFullPath))
+            File.Delete(imageFullPath);
 
-    //    return this._mapper.Map<CategoryForResultDto>(result);
-    //}
+        var mappedCategory = this._mapper.Map(dto, category);
+        mappedCategory.UpdatedAt = DateTime.UtcNow.AddHours(5);
+        mappedCategory.Image = image;
 
-    //public async Task<bool> RemoveAsync(long id)
-    //{
-    //    var category = await _repository.SelectAll()
-    //          .Where(c => c.Id == id)
-    //          .AsNoTracking()
-    //          .FirstOrDefaultAsync();
+        var result = await this._repository.UpdateAsync(mappedCategory);
 
-    //    if (category is null)
-    //        throw new SelenMebelException(404, "Category is not found!");
+        return this._mapper.Map<CategoryForResultDto>(result);
+    }
 
-    //    var imageFullPath = Path.Combine(WebHostEnviromentHelper.WebRootPath, category.Image);
+    public async Task<bool> RemoveAsync(long id)
+    {
+        var category = await _repository.SelectAll()
+              .Where(c => c.Id == id)
+              .AsNoTracking()
+              .FirstOrDefaultAsync();
 
-    //    if (File.Exists(imageFullPath))
-    //        File.Delete(imageFullPath);
+        if (category is null)
+            throw new SelenMebelException(404, "Category is not found !");
 
-    //    var result = await _repository.DeleteAsync(id);
-    //    category.IsDeleted = true;
+        var imageFullPath = Path.Combine(_hostingEnvironment.WebRootPath, category.Image);
 
-    //    return result;
-    //}
+        if (File.Exists(imageFullPath))
+            File.Delete(imageFullPath);
 
-    //public async Task<IEnumerable<CategoryForResultDto>> RetrieveAllAsync(PaginationParams @params)
-    //{
-    //    var category = await _repository.SelectAll()
-    //            .Include(c => c.TypeOfFurniture)
-    //            .ThenInclude(f => f.Furniture)
-    //            .ThenInclude(ff => ff.FurnitureFeature)
-    //            .AsNoTracking()
-    //            .ToPagedList(@params)
-    //            .ToListAsync();
+        var result = await _repository.DeleteAsync(id);
+        category.IsDeleted = true;
 
-    //    return _mapper.Map<IEnumerable<CategoryForResultDto>>(category);
-    //}
+        return result;
+    }
 
-    //public async Task<CategoryForResultDto> RetrieveByIdAsync(long id)
-    //{
-    //    var category = await this._repository.SelectAll()
-    //            .Where(c => c.Id == id)
-    //            .Include(dc => dc.TypeOfFurniture)
-    //            .ThenInclude(f => f.Furniture)
-    //            .ThenInclude(ff => ff.FurnitureFeature)
-    //            .AsNoTracking()
-    //            .FirstOrDefaultAsync();
+    public async Task<IEnumerable<CategoryForResultDto>> RetrieveAllAsync(PaginationParams @params)
+    {
+        var category = await _repository.SelectAll()
+            .Include(tof => tof.TypeOfFurnitures)
+            .ThenInclude(f => f.Furnitures)
+            .AsNoTracking()
+            .ToPagedList<Category>(@params)
+            .ToListAsync();
 
-    //    if (category is null)
-    //        throw new SelenMebelException(404, "Category is not found");
 
-    //    return this._mapper.Map<CategoryForResultDto>(category);
-    //}
+        return _mapper.Map<IEnumerable<CategoryForResultDto>>(category);
+    }
+
+    public async Task<IEnumerable<CategoryForResultDto>> RetrieveAllCategoriesAsync()
+    {
+        var category = await _repository.SelectAll()
+            .Include(tof => tof.TypeOfFurnitures)
+            .ThenInclude(f => f.Furnitures)
+            .AsNoTracking()
+            .ToListAsync();
+
+
+        return _mapper.Map<IEnumerable<CategoryForResultDto>>(category);
+    }
+
+    public async Task<CategoryForResultDto> RetrieveByIdAsync(long id)
+    {
+        var category = await this._repository.SelectAll()
+                .Where(c => c.Id == id)
+                .Include(tof => tof.TypeOfFurnitures)
+                .ThenInclude(f => f.Furnitures)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+        if (category is null)
+            throw new SelenMebelException(404, "Category is not found !");
+
+        return this._mapper.Map<CategoryForResultDto>(category);
+    }
+
+    public async Task<IEnumerable<CategoryForResultDto>> RetrieveByPropertiesOfCategoriesAsync(string searchTerm)
+    {
+        var query = _repository.SelectAll();
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            query = query.Where(x => x.Name.ToLower().Contains(searchTerm.ToLower()) || x.Id.ToString().Contains(searchTerm.ToLower()));
+        }
+
+        var category = await query.OrderByDescending(x => x.CreatedAt)
+                                  .Include(tof => tof.TypeOfFurnitures)
+                                  .ThenInclude(f => f.Furnitures)
+                                  .AsNoTracking()
+                                  .ToListAsync();
+        return _mapper.Map<IEnumerable<CategoryForResultDto>>(category);
+    }
 }

@@ -3,7 +3,8 @@
 namespace SelenMebel.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/")]
 public class BaseController : ControllerBase
 {
+
 }

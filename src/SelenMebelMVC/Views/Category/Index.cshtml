@@ -1,0 +1,169 @@
+﻿@model IEnumerable<SelenMebel.Service.DTOs.Categories.CategoryForResultDto>
+@{
+	ViewData["Title"] = "Category List";
+}
+
+<h3 class="text-center mb-2">@ViewData["Title"]</h3>
+
+@if (TempData["InfoMessage"] != null)
+{
+	<div class='alert alert-info alert-dismissible fade show' role='alert'>
+		<strong>Information ! </strong> @TempData["InfoMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
+else if (TempData["SuccessMessage"] != null)
+{
+	<div class='alert alert-success alert-dismissible fade show' role='alert'>
+		<strong>Success ! </strong> @TempData["SuccessMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
+else if (TempData["ErrorMessage"] != null)
+{
+	<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+		<strong>Error ! </strong> @TempData["ErrorMessage"]
+		<button type="button" class="close" data-ds-dismiss='alert' aria-label="Close">
+			<span>&times;</span>
+		</button>
+	</div>
+}
+
+
+<div class="row mb-2">
+	<div class="col">
+		<a class='btn btn-primary' asp-action="Create" asp-controller="Category" >Create New Category</a>
+	</div>
+	<div class="col">
+	</div>
+</div>
+
+<div class="row mb-3">
+	@using (Html.BeginForm("Index", "Category", FormMethod.Get))
+	{
+		<table>	
+			<tr>
+				<td>
+					<span><b>Search By:</b></span>
+					@Html.RadioButton("searchBy", "CategoryName", true)
+					<text>Category Name</text>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					@Html.TextBox("searchValue", null, new { Class = "form-control", placeholder = "Enter Category Name" })
+				</td>
+				<td>
+					&nbsp;
+				</td>
+				<td>
+					<input type="submit" value="Search" class="btn btn-success" />
+				</td>
+			</tr>
+		</table>
+	}
+</div>
+
+<nav aria-label="Page navigation">
+	<ul class="pagination justify-content-center">
+		@{
+			var pageIndex = ViewData["PageIndex"] != null ? (int)ViewData["PageIndex"] : 1;
+			var pageSize = ViewData["PageSize"] != null ? (int)ViewData["PageSize"] : 10;
+			var totalItems = ViewData["TotalItems"];
+			var totalPages = ViewData["TotalItems"] != null ? (int)Math.Ceiling((int)totalItems / (double)pageSize) : 1;
+
+			var searchBy = ViewData["SearchBy"];
+			var searchValue = ViewData["SearchValue"];
+		}
+
+		@if (totalPages > 1)
+		{
+			<li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=1&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">First</a>
+			</li>
+			<li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=@(pageIndex - 1)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Previous</a>
+			</li>
+
+			@for (var i = 1; i <= totalPages; i++)
+			{
+				<li class="page-item @(pageIndex == i ? "active" : "")" aria-current="page">
+					<a class="page-link" href="?pageIndex=@(i)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">@i</a>
+				</li>
+			}
+
+			<li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=@(pageIndex + 1)&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Next</a>
+			</li>
+			<li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+				<a class="page-link" href="?pageIndex=@totalPages&pageSize=@pageSize&searchBy=@searchBy&searchValue=@searchValue">Last</a>
+			</li>
+		}
+	</ul>
+</nav>
+<div style="height: 400px; overflow-y: auto;">
+	<table class="table table-bordered table-responsive table-hover">
+	<thead>
+		<tr class="table-active">
+			<th>
+				@Html.DisplayNameFor(model => model.Name)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Image)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.CreatedAt)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.UpdatedAt)
+			</th>
+			<th>
+				Action
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null && Model.Any())
+		{
+			@foreach (var category in Model)
+			{
+				<tr>
+					<td>
+						@Html.DisplayFor(model => category.Name)
+					</td>
+					<td>
+						<img src="~/@category.Image" alt="" width=150 />
+					</td>
+					<td>
+						@Html.DisplayFor(model => category.CreatedAt)
+					</td>
+					<td>
+						@Html.DisplayFor(model => category.UpdatedAt)
+					</td>
+					<td style="white-space:nowrap">
+						<div class="btn-group btn-group-sm">
+							<a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-primary btn-sm">Edit</a>
+							<a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-danger btn-sm">Delete</a>
+						</div>
+					</td>
+				</tr>
+			}
+		}
+		else
+		{
+			<tr>
+				<td colspan="2">
+					<div>
+						Categories not available in the database
+					</div>
+				</td>
+			</tr>
+		}
+	</tbody>
+
+</table>
+</div>
