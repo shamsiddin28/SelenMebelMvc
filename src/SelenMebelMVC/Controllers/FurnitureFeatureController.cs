@@ -305,8 +305,8 @@ namespace SelenMebelMVC.Controllers
         [Authorize(Roles = "admin, superadmin")]
         public async Task<ViewResult> Delete(long id)
         {
-            var furniture = await _furnitureFeatureService.RetrieveByIdAsync(id);
-            if (furniture is not null) return View("Delete", furniture);
+            var furnitureFeature = await _furnitureFeatureService.RetrieveByIdAsync(id);
+            if (furnitureFeature is not null) return View("Delete", furnitureFeature);
             else return View("Delete", id);
         }
 
@@ -315,11 +315,12 @@ namespace SelenMebelMVC.Controllers
         {
             try
             {
-                var product = await _furnitureFeatureService.RemoveAsync(id);
-                if (product)
+                var furniture = await _furnitureFeatureService.RetrieveByIdAsync(id);
+                var furnitureFeatureIsDeleted = await _furnitureFeatureService.RemoveAsync(id);
+                if (furnitureFeatureIsDeleted)
                 {
                     TempData["SuccessMessage"] = "FurnitureFeature Deleted Successfully !";
-                    return RedirectToAction("Details", "Furniture", new { id = id });
+                    return RedirectToAction("Details", "Furniture", new { id = furniture.Furniture.Id });
                 }
                 else
                 {

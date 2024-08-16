@@ -16,5 +16,4 @@ public class FurnitureFeatureForResultDto
     public DateTime? UpdatedAt { get; set; }
 
     public FurnitureForResultDto Furniture { get; set; }
-
 }

@@ -9,7 +9,7 @@ namespace SelenMebel.Domain.Entities.Orders;
 public class Order : Auditable
 {
     public long UserId { get; set; }
-
+    
     [Required]
     public OrderStatus OrderStatus { get; set; }
 
